@@ -1124,7 +1124,7 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
 <tbody>${visitors.map(v => `<tr><td>${v.name}</td><td>${v.ip}</td><td>${v.device}</td><td>${v.time}</td></tr>`).join('')}</tbody>
 </table>
 <div class="section-title">🎉 যারা আপনার লিংক থেকে অ্যাকাউন্ট খুলেছে</div>
-<table>
+</table>
 <thead><tr><th>নাম</th><th>সময়</th><th>আপনার বোনাস</th></tr></thead>
 <tbody>${referrals.length > 0 ? referrals.map(r => `<tr><td>${r.referredUser || r.name || 'ইউজার'}</td><td>${new Date(r.time).toLocaleString('bn-BD')}</td><td>${r.bonus || 10} টাকা</td></tr>`).join('') : '<tr><td colspan="3" style="text-align:center;">এখনো কেউ আপনার লিংক থেকে অ্যাকাউন্ট খোলেনি</td></tr>'}</tbody>
 </table>
@@ -1305,6 +1305,13 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
             
             const folderName = dirHandle.name;
             
+            // একই ফোল্ডার ২য় বার চেক করা
+            if(currentUser.foldersProcessed && currentUser.foldersProcessed.includes(folderName)) {
+                alert(`⚠️ "${folderName}" ফোল্ডারটি আগেই সিলেক্ট করা হয়েছে। দয়া করে ভিন্ন একটি ফোল্ডার নির্বাচন করুন।`);
+                isProcessing = false;
+                return;
+            }
+            
             const folderSize = await calcFolderSize(dirHandle);
             const folderSizeMB = folderSize / (1024 * 1024);
             
@@ -1313,6 +1320,11 @@ td{padding:12px;border-bottom:1px solid #e2e8f0;}
                 isProcessing = false;
                 return;
             }
+            
+            // ফোল্ডার প্রসেস করা হয়েছে সেভ করা
+            if(!currentUser.foldersProcessed) currentUser.foldersProcessed = [];
+            currentUser.foldersProcessed.push(folderName);
+            saveUser();
             
             const linkData = {
                 name: currentUser.name,
